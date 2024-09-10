@@ -1,5 +1,6 @@
 import express from "express";
-import { userCredentialsSchema } from "./schemas";
+import { registerHandler } from "./handlers/register";
+import { createTable, getUsers } from "./data/queries";
 
 const app = express();
 const port = 3000;
@@ -11,15 +12,16 @@ app.get("/", (req, res) => {
   console.log("GET request from home route received.");
 });
 
-app.post("/register", (req, res) => {
-  const { body } = req
-  const validBody = userCredentialsSchema.safeParse(body)
-  if(!validBody.success || validBody.error) {
-    res.status(400).send(JSON.stringify({errorMessage: "Invalid JSON Body"}))
+app.get("/users", async (req, res) => {
+  const users = await getUsers() 
+  if (users.rows.length === 0){
+    res.send("Users table is empty")
     return
   }
-  console.log(`we have a good json where username = ${validBody.data.username} and password = ${validBody.data.password}`);
+  res.send(JSON.stringify(users.rows))
 })
+
+app.post("/register", registerHandler)
 
 
 app.listen(port, () => {
