@@ -13,8 +13,7 @@ export const registerHandler = async (req: Request, res: Response) => {
   console.log(`we umm we have a good json where username = ${validBody.data.username} and password = ${validBody.data.password}`);
 
   await createTable();
-  const registerResult = await createUser(validBody.data)
-  console.log("user has been created presumably");
-  
-  res.status(200);
+  await createUser(validBody.data)
+  console.log(`${validBody.data.username} was created`);
+  res.status(200).send(`User created`);
 }

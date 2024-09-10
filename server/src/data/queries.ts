@@ -1,9 +1,10 @@
 import { pg_pool } from "./pg-pool";
 import { UserCredentials, ErrorMessage } from "../types";
 
-export const getUsers = async () => {
+export const getUsers = async (): Promise<any[] | ErrorMessage> => {
   const users = await pg_pool.query("SELECT * FROM users");
-  return users;
+  if(users.rows.length === 0) return {errorMessage: "Users table is empty"}
+  return users.rows;
 };
 
 export const findByUsername = async (username: string): Promise<UserCredentials | ErrorMessage > => {
@@ -56,3 +57,12 @@ export const createTable = async () => {
     console.log(err);
   }
 };
+
+export const clearTable = async () => {
+  try {
+    await pg_pool.query("DELETE FROM users");
+  } catch(err){
+    console.log(`err occurred in clearTable: ${err}`);
+    
+  }
+}

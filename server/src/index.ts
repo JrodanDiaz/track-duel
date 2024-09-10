@@ -1,6 +1,6 @@
 import express from "express";
 import { registerHandler } from "./handlers/register";
-import { createTable, getUsers } from "./data/queries";
+import { clearTable, getUsers } from "./data/queries";
 
 const app = express();
 const port = 3000;
@@ -12,14 +12,24 @@ app.get("/", (req, res) => {
   console.log("GET request from home route received.");
 });
 
-app.get("/users", async (req, res) => {
-  const users = await getUsers() 
-  if (users.rows.length === 0){
-    res.send("Users table is empty")
+app.post("/users", async (req, res) => {
+  const {body} = req
+
+  if(body.cmd === "clear") {
+    await clearTable();
+    res.status(200).send("Users table successfully cleared")
     return
   }
-  res.send(JSON.stringify(users.rows))
+
+  const users = await getUsers() 
+  if ("errorMessage" in users){
+    res.send("Users table is empty")
+  }
+
+  res.send(JSON.stringify(users))
 })
+
+
 
 app.post("/register", registerHandler)
 

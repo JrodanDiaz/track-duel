@@ -15,6 +15,12 @@ services:
       - 4444:5432
   app:
     image: node-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
     depends_on:
       db:
         condition: service_healthy
