@@ -1,14 +1,25 @@
 import { pg_pool } from "./pg-pool";
 import { UserCredentials, ErrorMessage } from "../types";
+import { hash } from "../encryption";
+import { Hash } from "crypto";
 
 export const getUsers = async (): Promise<any[] | ErrorMessage> => {
-  const users = await pg_pool.query("SELECT * FROM users");
-  if(users.rows.length === 0) return {errorMessage: "Users table is empty"}
-  return users.rows;
+  try 
+  {
+    const users = await pg_pool.query("SELECT * FROM public.users");
+    if(users.rows.length === 0) return {errorMessage: "Users table is empty"}
+    return users.rows;
+  } 
+  catch(err) 
+  {
+    console.log(`err in getUsers: ${err}`);
+    return {errorMessage: "Internal Server Error"}
+  }
 };
 
 export const findByUsername = async (username: string): Promise<UserCredentials | ErrorMessage > => {
-  try {
+  try 
+  {
     const query = "SELECT * FROM users WHERE username = $1";
     const res = await pg_pool.query(query, [username]);
     if (res.rows.length === 0)
@@ -18,7 +29,9 @@ export const findByUsername = async (username: string): Promise<UserCredentials 
       password: res.rows[0].password,
     };
     return user;
-  } catch (err) {
+  } 
+  catch (err) 
+  {
     console.log(err);
     return { errorMessage: "Internal server error" };
   }
@@ -31,9 +44,10 @@ export const userExists = async (username: string): Promise<boolean> => {
 };
 
 export const createUser = async (user: UserCredentials) => {
+  const passhash = await hash(user.password)
   const res = await pg_pool.query(
-    "INSERT INTO users (username, password) VALUES ($1, $2)",
-    [user.username, user.password]
+    "INSERT INTO users (username, passhash) VALUES ($1, $2)",
+    [user.username, passhash]
   );
 };
 
@@ -48,15 +62,15 @@ export const getUserIdFromUsername = async (
   return res.rows[0].id as string;
 };
 
-export const createTable = async () => {
-  try {
-    const res = await pg_pool.query(
-      "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL)"
-    );
-  } catch (err) {
-    console.log(err);
-  }
-};
+// export const createTable = async () => {
+//   try {
+//     const res = await pg_pool.query(
+//       "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username VARCHAR(100) NOT NULL, passhash VARCHAR(100) NOT NULL)"
+//     );
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
 
 export const clearTable = async () => {
   try {
