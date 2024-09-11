@@ -1,7 +1,7 @@
 import { pg_pool } from "./pg-pool";
-import { UserCredentials, ErrorMessage } from "../types";
-import { hash } from "../encryption";
-import { Hash } from "crypto";
+import { UserCredentials, ErrorMessage, DB_USERS_ROW } from "../types";
+import { hash, verify } from "../encryption";
+import { QueryResult } from "pg";
 
 export const getUsers = async (): Promise<any[] | ErrorMessage> => {
   try 
@@ -61,6 +61,14 @@ export const getUserIdFromUsername = async (
   if (res.rows[0].length === 0) return "";
   return res.rows[0].id as string;
 };
+
+export const validateUser = async (user: UserCredentials): Promise<boolean> => {
+  const users: QueryResult<DB_USERS_ROW> = await pg_pool.query("SELECT passhash FROM users where username = $1", [user.username])
+  if(users.rows.length === 0) {
+    return false
+  }
+  return await verify(user.password, users.rows[0].passhash)
+}
 
 // export const createTable = async () => {
 //   try {

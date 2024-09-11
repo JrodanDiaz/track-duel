@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from 'cookie-parser'
 import { registerHandler } from "./handlers/register";
 import { clearUsersHandler, getUsersHandler } from "./handlers/userHandler";
+import { loginHandler } from "./handlers/login";
 
 const app = express();
 const port = 3000;
@@ -18,8 +19,8 @@ app.get("/users", getUsersHandler)
 app.post("/users", clearUsersHandler)
 
 
-
 app.post("/register", registerHandler)
+app.post("/login", loginHandler)
 
 
 app.listen(port, () => {

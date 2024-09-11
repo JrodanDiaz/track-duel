@@ -6,3 +6,9 @@ export type UserCredentials = {
 export type ErrorMessage = {
     errorMessage: string
 }
+
+export type DB_USERS_ROW = {
+    id: number,
+    username: string,
+    passhash: string
+}

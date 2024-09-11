@@ -8,11 +8,11 @@ export const registerHandler = async (req: Request, res: Response) => {
   const validBody = userCredentialsSchema.safeParse(body)
 
   if(!validBody.success || validBody.error) {
+    console.log("Invalid JSON register body!");
     res.status(400).send(JSON.stringify({errorMessage: "Invalid JSON Body"}))
     return
   }
 
-  // await createTable();
   await createUser(validBody.data)
   const jwt = createJwt(validBody.data.username);
   console.log(`JWT generated: ${jwt}`);
