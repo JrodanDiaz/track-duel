@@ -7,6 +7,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
+    volumes:
+      - ./db-seeding/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db-seeding/seeding.sql:/docker-entrypoint-initdb.d/seeding.sql
     environment:
       POSTGRES_DB: db
       POSTGRES_PASSWORD: secret
