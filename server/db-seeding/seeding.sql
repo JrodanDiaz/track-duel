@@ -13,6 +13,10 @@ VALUES
     (
         'bourbon',
         'Necromancy'
+    ),
+    (
+        'darklordpge',
+        'soaked-in-honey'
     );
 
 \echo 'finished seeding db GOD'
