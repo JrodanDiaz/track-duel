@@ -1,33 +1,21 @@
 import express from "express";
+import cookieParser from 'cookie-parser'
 import { registerHandler } from "./handlers/register";
-import { clearTable, getUsers } from "./data/queries";
+import { clearUsersHandler, getUsersHandler } from "./handlers/userHandler";
 
 const app = express();
 const port = 3000;
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.get("/", (req, res) => {
   res.send("Express + TypeScript Server hello");
-  console.log("GET request from home route received.");
+  console.log("GET request from home route received");
 });
 
-app.post("/users", async (req, res) => {
-  const {body} = req
-
-  if(body.cmd === "clear") {
-    await clearTable();
-    res.status(200).send("Users table successfully cleared")
-    return
-  }
-
-  const users = await getUsers() 
-  if ("errorMessage" in users){
-    res.send("Users table is empty")
-  }
-
-  res.send(JSON.stringify(users))
-})
+app.get("/users", getUsersHandler)
+app.post("/users", clearUsersHandler)
 
 
 
