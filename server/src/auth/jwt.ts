@@ -6,5 +6,6 @@ export const createJwt = (username: string) => {
 
 export const jwtCookieOptions = {
     maxAge: 1000 * 60 * 15, 
-    httpOnly: true
+    secure: false,
+    httpOnly: true,
 }

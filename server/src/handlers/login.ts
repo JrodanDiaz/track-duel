@@ -9,7 +9,7 @@ export const loginHandler = async (req: Request, res: Response) => {
     const parsedCookies = authCookiesSchema.safeParse(req.cookies)
     if(parsedCookies.success && parsedCookies.data.auth_token) {
         console.log(`Redirecting from /login to / from auth_token = ${parsedCookies.data.auth_token}`);
-        res.redirect("/")
+        res.sendStatus(307)
         return
     }
     

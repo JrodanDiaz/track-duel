@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserCredentials } from "../types";
-import { RegisterUser } from "../api/auth";
-export default function RegisterPage() {
+import { LoginUser } from "../api/auth";
+export default function LoginPage() {
   const emptyUser: UserCredentials = { username: "", password: "" };
   const [user, setUser] = useState<UserCredentials>(emptyUser);
 
@@ -13,9 +13,9 @@ export default function RegisterPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(user);
-    RegisterUser(user)
+    LoginUser(user)
       .catch((err) => {
-        console.log(`error in registerUser: ${err}`);
+        console.log(`error in loginUser: ${err}`);
     })
   };
 

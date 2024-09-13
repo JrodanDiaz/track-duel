@@ -5,6 +5,7 @@ import Root from "./components/Root.tsx";
 import RegisterPage from "./components/RegisterPage.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
+import LoginPage from "./components/LoginPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <RegisterPage />,
   },
+  {
+    path: "/login",
+    element: <LoginPage />
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
