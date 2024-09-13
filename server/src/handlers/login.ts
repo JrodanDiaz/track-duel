@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import { authCookiesSchema, userCredentialsSchema } from "../schemas";
 import { validateUser } from "../data/queries";
 import { createJwt, jwtCookieOptions } from "../auth/jwt";
+import { isLoggedIn } from "../auth/utils";
 
 export const loginHandler = async (req: Request, res: Response) => {
     const {body} = req
     
-    const parsedCookies = authCookiesSchema.safeParse(req.cookies)
-    if(parsedCookies.success && parsedCookies.data.auth_token) {
-        console.log(`Redirecting from /login to / from auth_token = ${parsedCookies.data.auth_token}`);
+    if(isLoggedIn(req)) {
         res.sendStatus(307)
         return
     }
