@@ -1,15 +1,27 @@
-import dotenv from "dotenv";
 import express from "express";
-
-dotenv.config();
+import cookieParser from 'cookie-parser'
+import { registerHandler } from "./handlers/register";
+import { clearUsersHandler, getUsersHandler } from "./handlers/userHandler";
+import { loginHandler } from "./handlers/login";
 
 const app = express();
 const port = 3000;
 
+app.use(express.json())
+app.use(cookieParser())
+
 app.get("/", (req, res) => {
-  res.send("Express + TypeScript Server");
-  console.log("get home route");
+  res.send("Express + TypeScript Server hello");
+  console.log("GET request from home route received");
 });
+
+app.get("/users", getUsersHandler)
+app.post("/users", clearUsersHandler)
+
+
+app.post("/register", registerHandler)
+app.post("/login", loginHandler)
+
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
