@@ -1,5 +1,5 @@
-import { redirect } from "react-router-dom";
 import { UserCredentials } from "../types";
+import { tokenResponseSchema } from "../schemas";
 
 export async function RegisterUser(user: UserCredentials) {
   
@@ -11,11 +11,18 @@ export async function RegisterUser(user: UserCredentials) {
     body: JSON.stringify(user),
     credentials: "include"
   });
-  if (!response.ok) {
-    console.log("error occured in response");
+
+  if (response.status === 409) throw new Error("User already exists")
+  if (!response.ok) throw new Error("Internal Server Error")
+
+  const tokenData = await response.json()
+  const parsedToken = tokenResponseSchema.safeParse(tokenData)
+
+  if(!parsedToken.success) {
+    throw new Error("Failed to parse JSON")
   }
-  console.log("Register function probably succeeded");
-  
+
+  return parsedToken.data.auth_token
 }
 
 export async function LoginUser(user: UserCredentials) {

@@ -9,15 +9,19 @@ export const registerHandler = async (req: Request, res: Response) => {
 
   if(!validBody.success || validBody.error) {
     console.log("Invalid JSON register body!");
-    res.status(400).send(JSON.stringify({errorMessage: "Invalid JSON Body"}))
+    res.status(400).json({errorMessage: "Invalid JSON Request"})
     return
   }
 
-  await createUser(validBody.data)
+  const userCreated = await createUser(validBody.data)
+  if(!userCreated) {
+    res.status(409).send("User already exists")
+    return
+  }
   const jwt = createJwt(validBody.data.username);
   console.log(`JWT generated: ${jwt}`);
   
   res.cookie("auth_token", jwt, jwtCookieOptions)
-  res.status(200).send(`User ${validBody.data.username} successfully created`);
+  res.status(200).json({auth_token: jwt})
 
 }
