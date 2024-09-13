@@ -14,6 +14,9 @@ export default function RegisterPage() {
     e.preventDefault();
     console.log(user);
     RegisterUser(user)
+      .then(token => {
+        console.log(`token in RegisterPage: ${token}`);
+      })
       .catch((err) => {
         console.log(`error in registerUser: ${err}`);
     })

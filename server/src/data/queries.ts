@@ -43,12 +43,18 @@ export const userExists = async (username: string): Promise<boolean> => {
   return res.rows.length !== 0;
 };
 
-export const createUser = async (user: UserCredentials) => {
+export const createUser = async (user: UserCredentials): Promise<boolean> => {
   const passhash = await hash(user.password)
-  const res = await pg_pool.query(
-    "INSERT INTO users (username, passhash) VALUES ($1, $2)",
-    [user.username, passhash]
-  );
+  try {
+    await pg_pool.query(
+      "INSERT INTO users (username, passhash) VALUES ($1, $2)",
+      [user.username, passhash]
+    );
+    return true
+  } catch(err) {
+    console.log(`err in createUser: ${err}`);
+    return false 
+  }
 };
 
 export const getUserIdFromUsername = async (
