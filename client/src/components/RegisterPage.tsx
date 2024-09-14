@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { UserCredentials } from "../types";
 import { RegisterUser } from "../api/auth";
+import { useUserContext, useUserDispatchContext } from "./UserContext";
 export default function RegisterPage() {
-  const emptyUser: UserCredentials = { username: "", password: "" };
-  const [user, setUser] = useState<UserCredentials>(emptyUser);
+  const userContext = useUserContext()
+  const updateUserContext = useUserDispatchContext()
+  const [user, setUser] = useState<UserCredentials>({username: "", password: ""});
 
   const handleChange =
     (name: keyof UserCredentials) =>
@@ -15,7 +17,7 @@ export default function RegisterPage() {
     console.log(user);
     RegisterUser(user)
       .then(token => {
-        console.log(`token in RegisterPage: ${token}`);
+        updateUserContext({...userContext, username: user.username, auth_token: token})
       })
       .catch((err) => {
         console.log(`error in registerUser: ${err}`);
