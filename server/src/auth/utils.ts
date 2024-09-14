@@ -13,7 +13,6 @@ export const isLoggedIn = (req: Request): boolean => {
 export const getToken = (req: Request) => {
     const parsedToken = authCookiesSchema.safeParse(req.cookies)
     if(!parsedToken.success){
-        console.log("No auth cookies are currently set");
         return "" 
     }
     return parsedToken.data.auth_token

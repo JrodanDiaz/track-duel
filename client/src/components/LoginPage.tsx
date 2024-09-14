@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { UserCredentials } from "../types";
 import { LoginUser } from "../api/auth";
+import { useUserContext, useUserDispatchContext } from "./UserContext";
+
 export default function LoginPage() {
-  const emptyUser: UserCredentials = { username: "", password: "" };
-  const [user, setUser] = useState<UserCredentials>(emptyUser);
+
+  const userContext = useUserContext()
+  const updateUserContext = useUserDispatchContext()
+
+  const [user, setUser] = useState<UserCredentials>({username: "", password: ""});
 
   const handleChange =
     (name: keyof UserCredentials) =>
@@ -14,6 +19,9 @@ export default function LoginPage() {
     e.preventDefault();
     console.log(user);
     LoginUser(user)
+      .then((userData) => {
+        updateUserContext({...userData, spotify_token: userContext.spotify_token})
+      })
       .catch((err) => {
         console.log(`error in loginUser: ${err}`);
     })
