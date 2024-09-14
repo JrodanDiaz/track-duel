@@ -7,7 +7,7 @@ import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
 import LoginPage from "./components/LoginPage.tsx";
 import { UserProvider } from "./components/UserContext.tsx";
-import UnAuthGuard from "./components/AuthGuard.tsx";
+import UnAuthGuard from "./components/UnAuthGuard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: <UnAuthGuard element={<RegisterPage />} />,
   },
   {
     path: "/login",
