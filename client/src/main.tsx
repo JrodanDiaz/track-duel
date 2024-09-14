@@ -6,6 +6,7 @@ import RegisterPage from "./components/RegisterPage.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
 import LoginPage from "./components/LoginPage.tsx";
+import { UserProvider } from "./components/UserContext.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
   </StrictMode>
 );
