@@ -5,10 +5,11 @@ import { registerHandler } from "./handlers/register";
 import { clearUsersHandler, getUsersHandler } from "./handlers/userHandler";
 import { loginHandler } from "./handlers/login";
 import { spotifyLoginHandler, spotifyCallbackHandler } from "./handlers/spotifyHandler";
-import "dotenv/config"
+import dotenv from "dotenv"
 import { implicitLoginHandler } from "./handlers/implicit_login";
 import { getTokenHandler } from "./auth/utils";
 
+dotenv.config()
 const app = express();
 const port = 3000;
 
@@ -41,6 +42,8 @@ app.get('/auth/callback', spotifyCallbackHandler )
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+  // console.log(`Testing ENV: ${process.env.SPOTIFY_CLIENT_ID}`);
+  
 });
 
 /* 

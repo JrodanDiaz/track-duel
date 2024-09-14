@@ -20,9 +20,6 @@ export default function Root() {
         <div className="border-black border-[1px] rounded-sm p-3">
           <Link to="/login">login</Link>
         </div>
-        <div className="border-black border-[1px] rounded-sm p-3">
-          <Link to="/spotify">Login with Spotify</Link>
-        </div>
       </div>
     </>
   );
