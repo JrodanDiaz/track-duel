@@ -5,6 +5,9 @@ import Root from "./components/Root.tsx";
 import RegisterPage from "./components/RegisterPage.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
+import LoginPage from "./components/LoginPage.tsx";
+import { UserProvider } from "./components/UserContext.tsx";
+import UnAuthGuard from "./components/UnAuthGuard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,12 +25,18 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: <UnAuthGuard element={<RegisterPage />} />,
   },
+  {
+    path: "/login",
+    element: <UnAuthGuard element={<LoginPage />} />
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
   </StrictMode>
 );

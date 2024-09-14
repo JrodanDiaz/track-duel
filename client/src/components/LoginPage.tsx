@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { UserCredentials } from "../types";
-import { RegisterUser } from "../api/auth";
+import { LoginUser } from "../api/auth";
 import { useUserContext, useUserDispatchContext } from "./UserContext";
-export default function RegisterPage() {
+
+export default function LoginPage() {
+
   const userContext = useUserContext()
   const updateUserContext = useUserDispatchContext()
+
   const [user, setUser] = useState<UserCredentials>({username: "", password: ""});
 
   const handleChange =
@@ -15,12 +18,12 @@ export default function RegisterPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(user);
-    RegisterUser(user)
-      .then(token => {
-        updateUserContext({...userContext, username: user.username, auth_token: token})
+    LoginUser(user)
+      .then((userData) => {
+        updateUserContext({...userData, spotify_token: userContext.spotify_token})
       })
       .catch((err) => {
-        console.log(`error in registerUser: ${err}`);
+        console.log(`error in loginUser: ${err}`);
     })
   };
 
