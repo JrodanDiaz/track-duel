@@ -11,7 +11,7 @@ export default function UnAuthGuard({element}: {element: JSX.Element}) {
     }, [user])
 
     const checkToken = () => {
-        if(user.username) {
+        if(user.username && user.spotify_token) {
             navigate("/")
         }
     }
