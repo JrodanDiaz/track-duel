@@ -26,7 +26,7 @@ export const spotifyCallbackHandler = async (req: Request, res: Response) => {
   var code = req.query.code || null;
 
   if (code === null) {
-    console.log("state or code is null");
+    console.log("code is null");
     res.status(400).redirect("/")
   } else {
     console.log(`callback, code = ${code}`);
@@ -56,7 +56,7 @@ export const spotifyCallbackHandler = async (req: Request, res: Response) => {
         return
     }
     console.log(`we got the access token: ${parsedSpotifyResponse.data.access_token}`);
-    res.status(200).send("W")
+    res.redirect(`http://localhost:5173?token=${parsedSpotifyResponse.data.access_token}`)
   }
 ;
 } 

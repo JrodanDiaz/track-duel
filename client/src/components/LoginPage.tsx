@@ -81,34 +81,6 @@ export default function LoginPage() {
             Submit
           </button>
         </form> : <><button onClick={handleSpotifyClick} className="p border-black border-[1px] bg-green-600 text-black px-3 py-1">Authorize Spotify</button></>} 
-        {/* <form
-          action=""
-          className="flex flex-col justify-center items-center"
-          onSubmit={handleSubmit}
-        >
-          <input
-            className="border-black border-[1px] px-3 py-1"
-            type="text"
-            name="username"
-            id="username"
-            placeholder="Enter Username"
-            onChange={handleChange("username")}
-          />
-          <input
-            className="border-black border-[1px] px-3 py-1"
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Enter Password"
-            onChange={handleChange("password")}
-          />
-          <button
-            type="submit"
-            className="border-black border-[1px] px-4 py-2 bg-slate-400"
-          >
-            Submit
-          </button>
-        </form> */}
       </div>
     </>
   );

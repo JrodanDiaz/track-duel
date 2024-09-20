@@ -1,8 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useUserContext } from "./UserContext";
+import { useEffect } from "react";
 
 export default function Root() {
   const user = useUserContext()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    const spotifyToken = searchParams.get("token") || null
+    if(spotifyToken) {
+      localStorage.setItem("spotify-token", spotifyToken)
+      searchParams.delete("token")
+      setSearchParams(searchParams)
+    }
+  }, [])
 
   return (
     <>
