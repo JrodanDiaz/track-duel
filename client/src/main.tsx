@@ -8,6 +8,7 @@ import "./index.css";
 import LoginPage from "./components/LoginPage.tsx";
 import { UserProvider } from "./components/UserContext.tsx";
 import UnAuthGuard from "./components/UnAuthGuard.tsx";
+import Play from "./components/Play.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <UnAuthGuard element={<LoginPage />} />
+  },
+  {
+    path: "/play",
+    element: <Play />
   }
 ]);
 

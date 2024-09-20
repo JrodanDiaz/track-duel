@@ -31,6 +31,9 @@ export default function Root() {
         <div className="border-black border-[1px] rounded-sm p-3">
           <Link to="/login">login</Link>
         </div>
+        <div className="border-green-500 border-[1px] rounded-sm p-3">
+          <Link to="/play">Play music</Link>
+        </div>
       </div>
     </>
   );

@@ -8,3 +8,9 @@ export type User = {
   spotify_token: string
   username: string
 } 
+
+export interface Track {
+  artist: string;
+  title: string;
+  uri: string;
+}
