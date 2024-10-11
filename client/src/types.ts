@@ -10,7 +10,14 @@ export type User = {
 } 
 
 export interface Track {
+  cover: string | undefined;
   artist: string;
   title: string;
   uri: string;
+}
+
+export type Playlist = {
+  cover: string | undefined,
+  title: string,
+  uri: string
 }

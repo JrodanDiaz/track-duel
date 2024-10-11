@@ -2,7 +2,9 @@ import SpotifyWebApi from "spotify-web-api-node";
 import { Track } from "../types";
 import { useEffect, useState } from "react";
 import Player from "./Player";
+import PlaylistsContainer from "./PlaylistsContainer";
 import TrackSearchResult from "./TrackSearchResult";
+import { test_uris } from "../playlists";
 
 export default function Play() {
   const spotifyToken = localStorage.getItem("spotify-token");
@@ -55,6 +57,11 @@ export default function Play() {
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
             Choose your Track
           </h1>
+          <PlaylistsContainer
+            className="flex flex-wrap p-2"
+            uris={test_uris}
+            spotifyApi={spotifyApi}
+          />
           <input
             type="text"
             placeholder="Enter track..."
@@ -71,9 +78,11 @@ export default function Play() {
               {playingTrack.cover && (
                 <img src={playingTrack.cover} height={200} width={200} />
               )}
-              <Player accessToken={spotifyToken} trackUri={playingTrack?.uri} />
             </>
           )}
+          <div className={`${!playingTrack || search ? "hidden" : ""}`}>
+            <Player accessToken={spotifyToken} trackUri={playingTrack?.uri} />
+          </div>
           <div className="flex flex-wrap justify-evenly w-3/5">
             {searchResults.map((track, i) => (
               <TrackSearchResult

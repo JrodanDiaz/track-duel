@@ -9,7 +9,7 @@ interface PlayerProps {
 export default function Player({ accessToken, trackUri }: PlayerProps) {
   const [play, setPlay] = useState(false);
 
-  useEffect(() => setPlay(true), [trackUri]);
+  useEffect(() => setPlay(false), [trackUri]);
 
   if (!accessToken) return null;
   return (
