@@ -15,20 +15,25 @@ export default function Player({ accessToken, trackUri }: PlayerProps) {
   return (
     <>
       <button
-        className="b bg-orange-500 text-white px-2 py-4 rounded-xl"
+        className=" text-main-green px-6 py-3 border-2 border-main-green rounded-full"
         onClick={() => setPlay(!play)}
       >
-        Press me to play hopefully
+        <div className="flex items-center justify-center gap-2">
+          <img src="/play.svg" />
+          <p>{play ? "Pause" : "Start"} Track</p>
+        </div>
       </button>
-      <SpotifyPlayer
-        token={accessToken}
-        showSaveIcon
-        callback={(state) => {
-          if (!state.isPlaying) setPlay(false);
-        }}
-        play={play}
-        uris={trackUri ? [trackUri] : []}
-      />
+      <div className=" hidden">
+        <SpotifyPlayer
+          token={accessToken}
+          // showSaveIcon
+          callback={(state) => {
+            if (!state.isPlaying) setPlay(false);
+          }}
+          play={play}
+          uris={trackUri ? [trackUri] : []}
+        />
+      </div>
     </>
   );
 }
