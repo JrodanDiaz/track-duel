@@ -44,7 +44,7 @@ export async function LoginUser(user: UserCredentials) {
   const userData = implicitLoginSchema.safeParse(await response.json())
   if(!userData.success) throw new Error("Internal Server Error")
   if("errorMessage" in userData.data) throw new Error(userData.data.errorMessage)
-  return userData.data
+  return userData.data.auth_token
 }
 
 export const getToken = async (): Promise<string> => {
@@ -74,4 +74,8 @@ export const getToken = async (): Promise<string> => {
 
     return {...user.data, spotify_token: ""}
     
+  }
+
+  export const isLoggedIn = (user: User) => {
+    return user.username && user.spotify_token && user.auth_token
   }

@@ -1,6 +1,12 @@
 "use client";
 import { getUserFromToken } from "../api/auth";
-import { SetStateAction, createContext, useContext, useEffect, useState } from "react";
+import {
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { User } from "../types";
 
 const UserContext = createContext<User | undefined>(undefined);
@@ -30,20 +36,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>({
     auth_token: "",
     spotify_token: "",
-    username: ""
+    username: "",
   });
 
-    useEffect(() => {
-      if(user.username === "") {
-        getUserFromToken()
-          .then((user_) => {
-            setUser({...user, auth_token: user_.auth_token, username: user_.username})
-          })
-          .catch((err) => {
-            console.log(`Implicit Login Error: ${err}`);
-          })
-      }
-    }, [user])
+  useEffect(() => {
+    if (user.username === "") {
+      getUserFromToken()
+        .then((user_) => {
+          const spotifyToken = localStorage.getItem("spotify-token");
+          setUser({
+            spotify_token: !!spotifyToken ? spotifyToken : "",
+            auth_token: user_.auth_token,
+            username: user_.username,
+          });
+        })
+        .catch((err) => {
+          console.log(`Implicit Login Error: ${err}`);
+        });
+    }
+  }, [user]);
 
   return (
     <UserContext.Provider value={user}>
