@@ -16,8 +16,16 @@ export interface Track {
   uri: string;
 }
 
+export type TrackData = {
+  title: string,
+  artist: string,
+  cover: string | undefined,
+  uri: string
+}
+
 export type Playlist = {
   cover: string | undefined,
   title: string,
-  uri: string
+  uri: string,
+  trackData: TrackData[]
 }

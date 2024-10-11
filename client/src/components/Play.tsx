@@ -1,5 +1,5 @@
 import SpotifyWebApi from "spotify-web-api-node";
-import { Track } from "../types";
+import { Playlist, Track } from "../types";
 import { useEffect, useState } from "react";
 import Player from "./Player";
 import PlaylistsContainer from "./PlaylistsContainer";
@@ -16,6 +16,17 @@ export default function Play() {
   const [search, setSearch] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track>();
+  const [selectedPlaylist, setSelectedPlaylist] = useState<
+    Playlist | undefined
+  >();
+
+  useEffect(() => {
+    if (selectedPlaylist) {
+      selectedPlaylist.trackData.forEach((track) => {
+        console.log(JSON.stringify(track));
+      });
+    }
+  }, [selectedPlaylist]);
 
   const spotifyApi = new SpotifyWebApi({
     clientId: import.meta.env.SPOTIFY_CLIENT_ID,
@@ -60,6 +71,7 @@ export default function Play() {
             className="flex flex-wrap p-2"
             uris={test_uris}
             spotifyApi={spotifyApi}
+            setPlaylist={setSelectedPlaylist}
           />
           <input
             type="text"
