@@ -6,13 +6,15 @@ import BlackBackground from "./BlackBackground";
 import SexyButton from "./SexyButton";
 import { User } from "../types";
 import { handleSpotifyRedirect } from "../api/spotify";
+import Play from "./Play";
 
 export default function Root() {
   const user = useUserContext();
   const updateUser = useUserDispatchContext();
 
   if (isLoggedIn(user)) {
-    window.location.href = "/play";
+    return <Play />;
+    // window.location.href = "/play";
   }
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,7 +24,7 @@ export default function Root() {
     if (spotifyToken) {
       localStorage.setItem("spotify-token", spotifyToken);
       updateUser({ ...user, spotify_token: spotifyToken });
-      window.location.href = "/play";
+      // window.location.href = "/play";
       // searchParams.delete("token")
       // setSearchParams(searchParams)
     }
@@ -38,7 +40,7 @@ export default function Root() {
         <div className=" w-full flex flex-col justify-center items-center mt-8">
           <div className=" w-10/12 flex flex-col justify-center items-center text-center">
             <h1 className=" text-offwhite text-9xl font-protest">Track Duel</h1>
-            <p className=" text-surface75 text-2xl">
+            <p className=" text-surface75 text-2xl mt-4">
               Choose a Playlist, Album, or Artist, and be the first to guess the
               song
             </p>
@@ -48,7 +50,7 @@ export default function Root() {
               </p>
             )}
           </div>
-          <div className=" w-full flex justify-center items-center mt-10">
+          <div className=" w-full flex justify-center items-center gap-8 mt-10">
             {loggedInNoSpotify(user) ? (
               <SexyButton
                 bg="bg-main-green"
