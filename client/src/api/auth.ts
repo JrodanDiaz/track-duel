@@ -21,7 +21,7 @@ export async function RegisterUser(user: UserCredentials) {
   if(!parsedToken.success) throw new Error("Failed to parse JSON")
   if("errorMessage" in parsedToken.data) throw new Error(parsedToken.data.errorMessage)
 
-  return parsedToken.data.auth_token
+  return parsedToken.data.authToken
 }
 
 export async function LoginUser(user: UserCredentials) {
@@ -44,7 +44,7 @@ export async function LoginUser(user: UserCredentials) {
   const userData = implicitLoginSchema.safeParse(await response.json())
   if(!userData.success) throw new Error("Internal Server Error")
   if("errorMessage" in userData.data) throw new Error(userData.data.errorMessage)
-  return userData.data.auth_token
+  return userData.data.authToken
 }
 
 export const getToken = async (): Promise<string> => {
@@ -58,7 +58,7 @@ export const getToken = async (): Promise<string> => {
     if(!parsedToken.success) throw new Error("Auth token not set")
     if("errorMessage" in parsedToken.data) throw new Error(parsedToken.data.errorMessage)
 
-    return parsedToken.data.auth_token
+    return parsedToken.data.authToken
   }
 
   export const getUserFromToken = async (): Promise<User> => {
@@ -70,12 +70,12 @@ export const getToken = async (): Promise<string> => {
     if(!user.success) throw new Error("Internal Server Error")
     if("errorMessage" in user.data) throw new Error(user.data.errorMessage)
     
-    console.log(`getUserFromToken: username = ${user.data.username} token = ${user.data.auth_token}`);
+    console.log(`getUserFromToken: username = ${user.data.username} token = ${user.data.authToken}`);
 
-    return {...user.data, spotify_token: ""}
+    return {...user.data, spotifyToken: ""}
     
   }
 
   export const isLoggedIn = (user: User) => {
-    return user.username && user.spotify_token && user.auth_token
+    return user.username && user.spotifyToken && user.authToken
   }

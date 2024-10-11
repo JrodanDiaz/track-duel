@@ -5,6 +5,8 @@ import Player from "./Player";
 import PlaylistsContainer from "./PlaylistsContainer";
 import TrackSearchResult from "./TrackSearchResult";
 import { test_uris } from "../playlists";
+import { useSelector, UseSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 export default function Play() {
   const spotifyToken = localStorage.getItem("spotify-token");
@@ -12,6 +14,8 @@ export default function Play() {
     window.location.href = "/";
     return;
   }
+
+  const reduxUser = useSelector((state: RootState) => state.user);
 
   const [search, setSearch] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
@@ -65,7 +69,8 @@ export default function Play() {
       <div className=" w-screen h-screen bg-main-black py-4 md:py-12 overflow-y-auto">
         <div className=" w-full flex flex-col gap-10 justify-center items-center">
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
-            Choose your Track
+            Choose your Track {reduxUser.username}, with token{" "}
+            {reduxUser.spotifyToken}
           </h1>
           <PlaylistsContainer
             className="flex flex-wrap p-2"

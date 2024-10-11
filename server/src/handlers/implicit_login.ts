@@ -24,6 +24,6 @@ export const implicitLoginHandler = (req: Request, res: Response) => {
            respondWithError(res, 400, "Interal Server Error (no decoded JWT")
            return
         }
-        res.status(200).json({auth_token: token, username: decoded.sub})
+        res.status(200).json({authToken: token, username: decoded.sub})
     })
 }

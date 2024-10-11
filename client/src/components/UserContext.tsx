@@ -34,8 +34,8 @@ export const useUserDispatchContext = () => {
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>({
-    auth_token: "",
-    spotify_token: "",
+    authToken: "",
+    spotifyToken: "",
     username: "",
   });
 
@@ -44,9 +44,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       getUserFromToken()
         .then((user_) => {
           const spotifyToken = localStorage.getItem("spotify-token");
+
           setUser({
-            spotify_token: !!spotifyToken ? spotifyToken : "",
-            auth_token: user_.auth_token,
+            spotifyToken: !!spotifyToken ? spotifyToken : "",
+            authToken: user_.authToken,
             username: user_.username,
           });
         })

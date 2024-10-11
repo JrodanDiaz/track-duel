@@ -17,3 +17,10 @@ export const handleSpotifyRedirect = async () => {
       "https://accounts.spotify.com/authorize/?" + auth_query_params.toString();
   };
 
+  export const getSpotifyToken = (): string => {
+    const token = localStorage.getItem("spotify-token")
+    if(token) return token
+    return ""
+    
+  }
+

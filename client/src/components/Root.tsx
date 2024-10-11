@@ -7,10 +7,14 @@ import SexyButton from "./SexyButton";
 import { User } from "../types";
 import { handleSpotifyRedirect } from "../api/spotify";
 import Play from "./Play";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
+import { authenticateSpotify } from "../store/state/userState";
 
 export default function Root() {
   const user = useUserContext();
   const updateUser = useUserDispatchContext();
+  const dispatch = useDispatch<AppDispatch>();
 
   if (isLoggedIn(user)) {
     return <Play />;
@@ -23,7 +27,8 @@ export default function Root() {
     const spotifyToken = searchParams.get("token") || null;
     if (spotifyToken) {
       localStorage.setItem("spotify-token", spotifyToken);
-      updateUser({ ...user, spotify_token: spotifyToken });
+      updateUser({ ...user, spotifyToken: spotifyToken });
+      dispatch(authenticateSpotify(spotifyToken));
       // window.location.href = "/play";
       // searchParams.delete("token")
       // setSearchParams(searchParams)
@@ -31,7 +36,7 @@ export default function Root() {
   }, []);
 
   const loggedInNoSpotify = (user: User) => {
-    return user.username && user.auth_token && !user.spotify_token;
+    return user.username && user.authToken && !user.spotifyToken;
   };
 
   return (

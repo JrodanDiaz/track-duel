@@ -4,8 +4,8 @@ export type UserCredentials = {
 };
 
 export type User = {
-  auth_token: string
-  spotify_token: string
+  authToken: string
+  spotifyToken: string
   username: string
 } 
 
