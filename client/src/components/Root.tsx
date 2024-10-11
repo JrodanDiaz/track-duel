@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { isLoggedIn } from "../api/auth";
 import BlackBackground from "./BlackBackground";
 import SexyButton from "./SexyButton";
+import { User } from "../types";
+import { handleSpotifyRedirect } from "../api/spotify";
 
 export default function Root() {
   const user = useUserContext();
@@ -26,6 +28,10 @@ export default function Root() {
     }
   }, []);
 
+  const loggedInNoSpotify = (user: User) => {
+    return user.username && user.auth_token && !user.spotify_token;
+  };
+
   return (
     <>
       <BlackBackground>
@@ -36,55 +42,48 @@ export default function Root() {
               Choose a Playlist, Album, or Artist, and be the first to guess the
               song
             </p>
+            {user.username && (
+              <p className="text-lg text-surface75 underline">
+                Welcome back, {user.username}
+              </p>
+            )}
           </div>
           <div className=" w-full flex justify-center items-center mt-10">
-            <SexyButton
-              bg="bg-orangey"
-              text="text-orangey text-xl"
-              border="border-orangey"
-              content="Register"
-              px="px-12"
-              onClick={() => {
-                window.location.href = "/register";
-              }}
-            />
-            <SexyButton
-              bg="bg-main-green"
-              text="text-main-green text-xl"
-              border="border-main-green"
-              content="Sign In"
-              px="px-12"
-              onClick={() => {
-                window.location.href = "/login";
-              }}
-            />
+            {loggedInNoSpotify(user) ? (
+              <SexyButton
+                bg="bg-main-green"
+                text="text-main-green text-xl"
+                border="border-main-green"
+                content="Re-authenticate Spotify"
+                px="px-12"
+                onClick={handleSpotifyRedirect}
+              />
+            ) : (
+              <>
+                <Link to="/register">
+                  <SexyButton
+                    bg="bg-orangey"
+                    text="text-orangey text-xl"
+                    border="border-orangey"
+                    content="Register"
+                    px="px-12"
+                  />
+                </Link>
+                <Link to="/login">
+                  <SexyButton
+                    bg="bg-main-green"
+                    text="text-main-green text-xl"
+                    border="border-main-green"
+                    content="Sign In"
+                    px="px-12"
+                  />
+                </Link>
+              </>
+            )}
           </div>
         </div>
         <div className="w-full h-full"></div>
       </BlackBackground>
-    </>
-  );
-
-  return (
-    <>
-      <div className="flex gap-4">
-        <h1>Hello glorious daddy {user.username}</h1>
-        <div className="border-black border-[1px] rounded-sm p-3">
-          <h1>wsg gang</h1>
-        </div>
-        <div className="border-black border-[1px] rounded-sm p-3">
-          <h1>wsg gang</h1>
-        </div>
-        <div className="border-black border-[1px] rounded-sm p-3">
-          <Link to="/register">Register</Link>
-        </div>
-        <div className="border-black border-[1px] rounded-sm p-3">
-          <Link to="/login">login</Link>
-        </div>
-        <div className="border-green-500 border-[1px] rounded-sm p-3">
-          <Link to="/play">Play music</Link>
-        </div>
-      </div>
     </>
   );
 }
