@@ -2,23 +2,17 @@ import { useState } from "react";
 import { handleSpotifyRedirect } from "../api/spotify";
 import { UserCredentials } from "../types";
 import BlackBackground from "./BlackBackground";
-import { useUserContext, useUserDispatchContext } from "./UserContext";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../store/store";
-import {
-  authenticateUser,
-  authenticateSpotify,
-} from "../store/state/userState";
+import { authenticateUser } from "../store/state/userState";
+import useUser from "../hooks/useUser";
+import useAppDispatch from "../hooks/useAppDispatch";
 
 interface Props {
   authAction: (user: UserCredentials) => Promise<string>;
   title: string;
 }
 export default function AuthForm({ authAction, title }: Props) {
-  const reduxUser = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch<AppDispatch>();
-  const userContext = useUserContext();
-  const updateUserContext = useUserDispatchContext();
+  const userStore = useUser();
+  const dispatch = useAppDispatch();
   const [authorized, setAuthorized] = useState(false);
   const [user, setUser] = useState<UserCredentials>({
     username: "",
@@ -42,18 +36,10 @@ export default function AuthForm({ authAction, title }: Props) {
             authToken: token,
           })
         );
-        updateUserContext({
-          ...userContext,
-          username: user.username,
-          authToken: token,
-        });
         setAuthorized(true);
       })
       .catch((err) => {
         console.log(`error in registerUser: ${err}`);
-      })
-      .finally(() => {
-        console.log(`redux user after update: ${reduxUser.username}`);
       });
   };
 
@@ -65,7 +51,7 @@ export default function AuthForm({ authAction, title }: Props) {
             <p className={` text-offwhite text-6xl font-bebas`}>
               {authorized ? "Integrate Spotify" : title}
             </p>
-            <p className="text-offwhite text-3xl">User: {reduxUser.username}</p>
+            <p className="text-offwhite text-3xl">User: {userStore.username}</p>
             <form
               className="flex flex-col justify-center items-center gap-9 w-5/6"
               onSubmit={handleSubmit}

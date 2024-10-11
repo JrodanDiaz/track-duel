@@ -21,6 +21,9 @@ export const handleSpotifyRedirect = async () => {
     const token = localStorage.getItem("spotify-token")
     if(token) return token
     return ""
-    
+  }
+
+  export const setSpotifyToken = (token: string) => {
+    localStorage.setItem("spotify-token", token)
   }
 

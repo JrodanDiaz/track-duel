@@ -1,13 +1,13 @@
-import { useDispatch, useSelector, UseSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store/store";
 import { useEffect } from "react";
 import { getUserFromToken } from "../api/auth";
 import { updateUser } from "../store/state/userState";
 import { getSpotifyToken } from "../api/spotify";
+import useAppDispatch from "../hooks/useAppDispatch";
+import useUser from "../hooks/useUser";
 
 export default function useAuthCheck() {
-  const userStore = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch<AppDispatch>();
+  const userStore = useUser();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (userStore.username === "") {

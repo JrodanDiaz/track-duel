@@ -1,19 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../../types";
 
-interface UserState {
-    username: string;
-    authToken: string;
-    spotifyToken: string;
-}
 
 interface PartialUser {
     username: string;
     authToken: string;
 }
 
-const initialState: UserState = {
-    username: "pleasework",
+const initialState: User = {
+    username: "",
     authToken: "",
     spotifyToken: ""
 }
@@ -22,7 +17,7 @@ const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        updateUser(state, action: PayloadAction<UserState>){
+        updateUser(state, action: PayloadAction<User>){
             return {...state, ...action.payload}
         },
         authenticateUser(state, action: PayloadAction<PartialUser>)  {

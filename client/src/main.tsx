@@ -6,7 +6,6 @@ import RegisterPage from "./components/RegisterPage.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
 import LoginPage from "./components/LoginPage.tsx";
-import { UserProvider } from "./components/UserContext.tsx";
 import UnAuthGuard from "./components/UnAuthGuard.tsx";
 import Play from "./components/Play.tsx";
 import { Provider } from "react-redux";
@@ -43,9 +42,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <UserProvider>
-        <RouterProvider router={router} />
-      </UserProvider>
+      <RouterProvider router={router} />
     </Provider>
   </StrictMode>
 );
