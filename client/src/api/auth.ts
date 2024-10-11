@@ -75,3 +75,7 @@ export const getToken = async (): Promise<string> => {
     return {...user.data, spotify_token: ""}
     
   }
+
+  export const isLoggedIn = (user: User) => {
+    return user.username && user.spotify_token && user.auth_token
+  }

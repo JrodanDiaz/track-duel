@@ -9,7 +9,6 @@ import { test_uris } from "../playlists";
 export default function Play() {
   const spotifyToken = localStorage.getItem("spotify-token");
   if (!spotifyToken) {
-    console.log("spotifyToken not set");
     window.location.href = "/";
     return;
   }
@@ -52,7 +51,7 @@ export default function Play() {
 
   return (
     <>
-      <div className=" w-screen h-screen bg-main-black py-4 md:py-12">
+      <div className=" w-screen h-screen bg-main-black py-4 md:py-12 overflow-y-auto">
         <div className=" w-full flex flex-col gap-10 justify-center items-center">
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
             Choose your Track
