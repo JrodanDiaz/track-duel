@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Playlist } from "../types";
 import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
 
 interface Props {
