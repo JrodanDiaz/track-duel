@@ -1,37 +1,37 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { useUserContext, useUserDispatchContext } from "./UserContext";
 import { useEffect } from "react";
 import { isLoggedIn } from "../api/auth";
 import BlackBackground from "./BlackBackground";
 import SexyButton from "./SexyButton";
 import { User } from "../types";
-import { handleSpotifyRedirect } from "../api/spotify";
+import { handleSpotifyRedirect, setSpotifyToken } from "../api/spotify";
 import Play from "./Play";
+import { authenticateSpotify } from "../store/state/userState";
+import useUser from "../hooks/useUser";
+import useAuthCheck from "./AuthCheck";
+import useAppDispatch from "../hooks/useAppDispatch";
 
 export default function Root() {
-  const user = useUserContext();
-  const updateUser = useUserDispatchContext();
-
-  if (isLoggedIn(user)) {
-    return <Play />;
-    // window.location.href = "/play";
-  }
-
+  useAuthCheck();
+  const user = useUser();
+  const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const spotifyToken = searchParams.get("token") || null;
+    const spotifyToken = searchParams.get("token");
     if (spotifyToken) {
-      localStorage.setItem("spotify-token", spotifyToken);
-      updateUser({ ...user, spotify_token: spotifyToken });
-      // window.location.href = "/play";
-      // searchParams.delete("token")
-      // setSearchParams(searchParams)
+      setSpotifyToken(spotifyToken);
+      dispatch(authenticateSpotify(spotifyToken));
+      setSearchParams("");
     }
   }, []);
 
+  if (isLoggedIn(user)) {
+    return <Play />;
+  }
+
   const loggedInNoSpotify = (user: User) => {
-    return user.username && user.auth_token && !user.spotify_token;
+    return user.username && user.authToken && !user.spotifyToken;
   };
 
   return (

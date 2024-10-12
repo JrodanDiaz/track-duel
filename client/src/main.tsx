@@ -6,9 +6,11 @@ import RegisterPage from "./components/RegisterPage.tsx";
 import ErrorPage from "./components/ErrorPage.tsx";
 import "./index.css";
 import LoginPage from "./components/LoginPage.tsx";
-import { UserProvider } from "./components/UserContext.tsx";
 import UnAuthGuard from "./components/UnAuthGuard.tsx";
 import Play from "./components/Play.tsx";
+import { Provider } from "react-redux";
+import { store } from "./store/store.ts";
+import Playlist from "./components/Playlist.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,18 +32,23 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <UnAuthGuard element={<LoginPage />} />
+    element: <UnAuthGuard element={<LoginPage />} />,
   },
   {
     path: "/play",
-    element: <Play />
-  }
+    element: <Play />,
+  },
+  {
+    path: "/playlist",
+    element: <Playlist />,
+    errorElement: <ErrorPage />,
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <UserProvider>
+    <Provider store={store}>
       <RouterProvider router={router} />
-    </UserProvider>
+    </Provider>
   </StrictMode>
 );

@@ -55,7 +55,7 @@ export const spotifyCallbackHandler = async (req: Request, res: Response) => {
         console.log("Spotify Response JSON failed zod validation");
         return
     }
-    console.log(`we got the access token: ${parsedSpotifyResponse.data.access_token}`);
+    console.log(`Spotify Access Token Obtained: ${parsedSpotifyResponse.data.access_token}`);
     res.redirect(`http://localhost:5173?token=${parsedSpotifyResponse.data.access_token}`)
   }
 ;

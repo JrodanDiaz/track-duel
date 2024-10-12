@@ -2,15 +2,17 @@ import { useState } from "react";
 import { handleSpotifyRedirect } from "../api/spotify";
 import { UserCredentials } from "../types";
 import BlackBackground from "./BlackBackground";
-import { useUserContext, useUserDispatchContext } from "./UserContext";
+import { authenticateUser } from "../store/state/userState";
+import useUser from "../hooks/useUser";
+import useAppDispatch from "../hooks/useAppDispatch";
 
 interface Props {
   authAction: (user: UserCredentials) => Promise<string>;
   title: string;
 }
 export default function AuthForm({ authAction, title }: Props) {
-  const userContext = useUserContext();
-  const updateUserContext = useUserDispatchContext();
+  const userStore = useUser();
+  const dispatch = useAppDispatch();
   const [authorized, setAuthorized] = useState(false);
   const [user, setUser] = useState<UserCredentials>({
     username: "",
@@ -25,13 +27,15 @@ export default function AuthForm({ authAction, title }: Props) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(user);
+
     authAction(user)
       .then((token) => {
-        updateUserContext({
-          ...userContext,
-          username: user.username,
-          auth_token: token,
-        });
+        dispatch(
+          authenticateUser({
+            username: user.username,
+            authToken: token,
+          })
+        );
         setAuthorized(true);
       })
       .catch((err) => {
@@ -47,6 +51,7 @@ export default function AuthForm({ authAction, title }: Props) {
             <p className={` text-offwhite text-6xl font-bebas`}>
               {authorized ? "Integrate Spotify" : title}
             </p>
+            <p className="text-offwhite text-3xl">User: {userStore.username}</p>
             <form
               className="flex flex-col justify-center items-center gap-9 w-5/6"
               onSubmit={handleSubmit}

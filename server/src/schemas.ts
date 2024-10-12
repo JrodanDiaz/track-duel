@@ -6,7 +6,7 @@ export const userCredentialsSchema = z.object({
   });
 
 export const authCookiesSchema = z.object({
-  auth_token: z.string().min(1),
+  authToken: z.string().min(1),
 })
 
 export const spotifyTokenSchema = z.object({
