@@ -78,7 +78,7 @@ export default function Play() {
       <div className=" w-screen h-screen bg-main-black py-4 md:py-12 overflow-y-auto">
         <div className=" w-full flex flex-col gap-10 justify-center items-center">
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
-            Choose your Track {user.username}, with token {user.spotifyToken}
+            Choose your Track, {user.username}
           </h1>
           <h1 className="text-3xl text-offwhite font-protest"></h1>
           {isLoading && (
