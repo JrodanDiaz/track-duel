@@ -1,5 +1,5 @@
 import SpotifyWebApi from "spotify-web-api-node";
-import { Playlist, Track } from "../types";
+import { Track } from "../types";
 import { useEffect, useState } from "react";
 import Player from "./Player";
 import PlaylistsContainer from "./PlaylistsContainer";
@@ -8,10 +8,8 @@ import { test_uris } from "../playlists";
 import useUser from "../hooks/useUser";
 import { isLoggedIn } from "../api/auth";
 import { getSpotifyToken } from "../api/spotify";
-import {
-  useGetPlaylistEssentialsQuery,
-  useGetPlaylistQuery,
-} from "../store/api/playlistsApiSlice";
+import { useGetPlaylistEssentialsQuery } from "../store/api/playlistsApiSlice";
+import { PlaylistMinimumResponse } from "../api/spotifyTypes";
 
 export default function Play() {
   const user = useUser();
@@ -30,16 +28,8 @@ export default function Play() {
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track>();
   const [selectedPlaylist, setSelectedPlaylist] = useState<
-    Playlist | undefined
+    PlaylistMinimumResponse | undefined
   >();
-
-  useEffect(() => {
-    if (selectedPlaylist) {
-      selectedPlaylist.trackData.forEach((track) => {
-        console.log(JSON.stringify(track));
-      });
-    }
-  }, [selectedPlaylist]);
 
   const spotifyApi = new SpotifyWebApi({
     clientId: import.meta.env.SPOTIFY_CLIENT_ID,
@@ -53,19 +43,22 @@ export default function Play() {
 
   useEffect(() => {
     if (!search) return setSearchResults([]);
-    spotifyApi.searchTracks(search, { limit: 5 }).then((res) => {
-      if (!res?.body?.tracks) return;
-      setSearchResults(
-        res.body.tracks.items.map((track) => {
-          return {
-            cover: track.album.images[0].url,
-            artist: track.artists[0].name,
-            title: track.name,
-            uri: track.uri,
-          };
-        })
-      );
-    });
+    const timerId = setTimeout(() => {
+      spotifyApi.searchTracks(search, { limit: 5 }).then((res) => {
+        if (!res?.body?.tracks) return;
+        setSearchResults(
+          res.body.tracks.items.map((track) => {
+            return {
+              cover: track.album.images[0].url,
+              artist: track.artists[0].name,
+              title: track.name,
+              uri: track.uri,
+            };
+          })
+        );
+      });
+    }, 500);
+    return () => clearTimeout(timerId);
   }, [search]);
 
   //this is lowkey working, just need to get the track uri's and call it a day
