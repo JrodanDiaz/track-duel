@@ -13,6 +13,10 @@ export default function useAuthCheck() {
     if (userStore.username === "") {
       getUserFromToken()
         .then((user) => {
+          console.log(
+            `Implicit Login Success: User = ${user.username} Token = ${user.authToken}`
+          );
+
           dispatch(
             updateUser({
               username: user.username,

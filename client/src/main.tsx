@@ -10,6 +10,7 @@ import UnAuthGuard from "./components/UnAuthGuard.tsx";
 import Play from "./components/Play.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+import Playlist from "./components/Playlist.tsx";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,11 @@ const router = createBrowserRouter([
   {
     path: "/play",
     element: <Play />,
+  },
+  {
+    path: "/playlist",
+    element: <Playlist />,
+    errorElement: <ErrorPage />,
   },
 ]);
 

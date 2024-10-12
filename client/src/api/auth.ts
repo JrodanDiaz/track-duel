@@ -70,7 +70,6 @@ export const getToken = async (): Promise<string> => {
     if(!user.success) throw new Error("Internal Server Error")
     if("errorMessage" in user.data) throw new Error(user.data.errorMessage)
     
-    console.log(`getUserFromToken: username = ${user.data.username} token = ${user.data.authToken}`);
 
     return {...user.data, spotifyToken: ""}
     
