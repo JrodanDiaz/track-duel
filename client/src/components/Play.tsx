@@ -10,6 +10,7 @@ import { isLoggedIn } from "../api/auth";
 import { getSpotifyToken } from "../api/spotify";
 import { useGetPlaylistEssentialsQuery } from "../store/api/playlistsApiSlice";
 import { PlaylistMinimumResponse } from "../api/spotifyTypes";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function Play() {
   const user = useUser();
@@ -18,18 +19,21 @@ export default function Play() {
     return;
   }
 
+  const [search, setSearch] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<Track[]>([]);
+  const [playingTrack, setPlayingTrack] = useState<Track>();
+  const [selectedPlaylistUri, setSelectedPlaylistUri] = useState<
+    string | undefined
+  >(test_uris[0]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<
+    PlaylistMinimumResponse | undefined
+  >();
+
   const {
     data: playlistData,
     isLoading,
     isError,
-  } = useGetPlaylistEssentialsQuery(test_uris[0]);
-
-  const [search, setSearch] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<Track[]>([]);
-  const [playingTrack, setPlayingTrack] = useState<Track>();
-  const [selectedPlaylist, setSelectedPlaylist] = useState<
-    PlaylistMinimumResponse | undefined
-  >();
+  } = useGetPlaylistEssentialsQuery(selectedPlaylistUri ?? skipToken);
 
   const spotifyApi = new SpotifyWebApi({
     clientId: import.meta.env.SPOTIFY_CLIENT_ID,
@@ -73,6 +77,9 @@ export default function Play() {
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
             Choose your Track, {user.username}
           </h1>
+          {playlistData && (
+            <h1 className=" text-2xl text-offwhite">{playlistData.name}</h1>
+          )}
           <h1 className="text-3xl text-offwhite font-protest"></h1>
           {isLoading && (
             <h1 className="text-3xl text-offwhite font-protest">LOADING</h1>
@@ -84,8 +91,7 @@ export default function Play() {
           <PlaylistsContainer
             className="flex flex-wrap p-2"
             uris={test_uris}
-            spotifyApi={spotifyApi}
-            setPlaylist={setSelectedPlaylist}
+            setPlaylistUri={setSelectedPlaylistUri}
           />
           <input
             type="text"
