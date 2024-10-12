@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
-import { Playlist, TrackData } from "../types";
+import { Playlist } from "../types";
+import { PlaylistMinimumResponse } from "../api/spotifyTypes";
+import {
+  useGetPlaylistEssentialsQuery,
+  useGetPlaylistMinimumQuery,
+} from "../store/api/playlistsApiSlice";
 
 interface Props {
   uris: string[];
@@ -15,62 +20,52 @@ export default function PlaylistsContainer({
   spotifyApi,
   setPlaylist,
 }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [playlists_, setPlaylists] = useState<Playlist[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
-  useEffect(() => {
-    const fetchPlaylists = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const responses = await Promise.all(
-          uris.map((uri) => spotifyApi.getPlaylist(uri))
-        );
+  const playlistQueries = uris.map((uri) => useGetPlaylistMinimumQuery(uri));
 
-        const playlistData: Playlist[] = await Promise.all(
-          responses.map((response) => {
-            if (response.statusCode != 200) {
-              throw new Error("Bad Request From Spotify Get Playlists");
-            }
+  return (
+    <>
+      <div className={className}>
+        {playlistQueries.map((query, index) => {
+          const { data: playlist, isLoading, error } = query;
 
-            return {
-              cover: response.body.images[0].url,
-              title: response.body.name,
-              uri: response.body.uri,
-              trackData: response.body.tracks.items
-                .map((item) => ({
-                  uri: item.track?.uri,
-                  title: item.track?.name,
-                  artist: item.track?.artists[0].name,
-                  cover: item.track?.album.images[0].url,
-                }))
-                .filter((track) => track.uri && track.title && track.cover)
-                .map(
-                  (track): TrackData => ({
-                    // Cast to TrackData type
-                    uri: track.uri!,
-                    title: track.title!,
-                    artist: track.artist!,
-                    cover: track.cover,
-                  })
-                ),
-            };
-          })
-        );
-        setPlaylists(playlistData);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPlaylists();
-  }, [uris]);
+          if (isLoading)
+            return (
+              <div key={index} className=" text-lilac">
+                Loading playlist {index + 1}...
+              </div>
+            );
 
-  if (loading) return <div className=" text-offwhite">Loading...</div>;
-  if (error) return <div className=" text-red-600">ERROR OCCURRED</div>;
+          if (error || playlist === undefined)
+            return (
+              <div key={index} className=" text-red-500">
+                Error fetching playlist {index + 1}
+              </div>
+            );
+
+          return (
+            <div
+              key={`${index}-${playlist.name}`}
+              className={`flex flex-col flex-wrap gap-4 justify-evenly items-center cursor-pointer ${
+                index === selectedIndex && "border-2 border-lilac"
+              }`}
+              onClick={() => {
+                setSelectedIndex(index);
+                setPlaylist(playlists_[index]);
+              }}
+            >
+              {playlist.images[0].url && (
+                <img src={playlist.images[0].url} height={150} width={150} />
+              )}
+              <p className=" text-offwhite">{playlist.name}</p>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
 
   return (
     <>

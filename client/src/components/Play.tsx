@@ -20,9 +20,11 @@ export default function Play() {
     return;
   }
 
-  const { data, isLoading, isError } = useGetPlaylistEssentialsQuery(
-    test_uris[0]
-  );
+  const {
+    data: playlistData,
+    isLoading,
+    isError,
+  } = useGetPlaylistEssentialsQuery(test_uris[0]);
 
   const [search, setSearch] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
@@ -85,9 +87,7 @@ export default function Play() {
           {isError && (
             <h1 className="text-3xl text-red-600 font-protest">ERROR</h1>
           )}
-          {data && (
-            <h1 className=" text-xl text-offwhite">{JSON.stringify(data)}</h1>
-          )}
+
           <PlaylistsContainer
             className="flex flex-wrap p-2"
             uris={test_uris}

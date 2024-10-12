@@ -31,3 +31,8 @@ export interface PlaylistResponse {
   name: string;
   tracks: Tracks;
 }
+
+export interface PlaylistMinimumResponse {
+    images: Image[],
+    name: string;
+}
