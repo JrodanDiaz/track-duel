@@ -29,3 +29,9 @@ export type Playlist = {
   uri: string,
   trackData: TrackData[]
 }
+
+export type PlaylistQuery = {
+  playlist_id: string,
+  fields?: string
+}
+

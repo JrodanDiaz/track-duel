@@ -27,3 +27,5 @@ export const handleSpotifyRedirect = async () => {
     localStorage.setItem("spotify-token", token)
   }
 
+  export const SpotifyApiEndpoint = "https://api.spotify.com/v1"
+

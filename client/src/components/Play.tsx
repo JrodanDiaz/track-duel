@@ -8,6 +8,10 @@ import { test_uris } from "../playlists";
 import useUser from "../hooks/useUser";
 import { isLoggedIn } from "../api/auth";
 import { getSpotifyToken } from "../api/spotify";
+import {
+  useGetPlaylistEssentialsQuery,
+  useGetPlaylistQuery,
+} from "../store/api/playlistsApiSlice";
 
 export default function Play() {
   const user = useUser();
@@ -15,6 +19,10 @@ export default function Play() {
     window.location.href = "/";
     return;
   }
+
+  const { data, isLoading, isError } = useGetPlaylistEssentialsQuery(
+    test_uris[0]
+  );
 
   const [search, setSearch] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
@@ -70,6 +78,16 @@ export default function Play() {
           <h1 className=" text-6xl text-offwhite text-pretty text-center">
             Choose your Track {user.username}, with token {user.spotifyToken}
           </h1>
+          <h1 className="text-3xl text-offwhite font-protest"></h1>
+          {isLoading && (
+            <h1 className="text-3xl text-offwhite font-protest">LOADING</h1>
+          )}
+          {isError && (
+            <h1 className="text-3xl text-red-600 font-protest">ERROR</h1>
+          )}
+          {data && (
+            <h1 className=" text-xl text-offwhite">{JSON.stringify(data)}</h1>
+          )}
           <PlaylistsContainer
             className="flex flex-wrap p-2"
             uris={test_uris}

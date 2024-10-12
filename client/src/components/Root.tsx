@@ -18,7 +18,7 @@ export default function Root() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const spotifyToken = searchParams.get("token") || null;
+    const spotifyToken = searchParams.get("token");
     if (spotifyToken) {
       setSpotifyToken(spotifyToken);
       dispatch(authenticateSpotify(spotifyToken));
