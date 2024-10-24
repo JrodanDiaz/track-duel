@@ -1,20 +1,20 @@
-import { useNavigate } from "react-router-dom"
-import { useUserContext } from "./UserContext"
-import { useEffect } from "react"
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import useUser from "../hooks/useUser";
 
-export default function UnAuthGuard({element}: {element: JSX.Element}) {
-    const user = useUserContext()
-    const navigate = useNavigate()
+export default function UnAuthGuard({ element }: { element: JSX.Element }) {
+  const user = useUser();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        checkToken()
-    }, [user])
+  useEffect(() => {
+    checkToken();
+  }, [user]);
 
-    const checkToken = () => {
-        if(user.username && user.spotify_token) {
-            navigate("/")
-        }
+  const checkToken = () => {
+    if (user.username && user.spotifyToken) {
+      navigate("/");
     }
+  };
 
-    return <>{element}</>
+  return <>{element}</>;
 }

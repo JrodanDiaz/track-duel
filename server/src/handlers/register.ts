@@ -21,7 +21,7 @@ export const registerHandler = async (req: Request, res: Response) => {
   const jwt = createJwt(validBody.data.username);
   console.log(`JWT generated: ${jwt}`);
   
-  res.cookie("auth_token", jwt, jwtCookieOptions)
-  res.status(200).json({auth_token: jwt})
+  res.cookie("authToken", jwt, jwtCookieOptions)
+  res.status(200).json({authToken: jwt})
 
 }

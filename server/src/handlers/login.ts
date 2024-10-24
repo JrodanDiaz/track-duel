@@ -25,6 +25,6 @@ export const loginHandler = async (req: Request, res: Response) => {
     }
     
     const jwt = createJwt(parsedBody.data.username)
-    res.cookie("auth_token", jwt, jwtCookieOptions)
-    res.status(200).json({auth_token: jwt, username: parsedBody.data.username})
+    res.cookie("authToken", jwt, jwtCookieOptions)
+    res.status(200).json({authToken: jwt, username: parsedBody.data.username})
 }

@@ -3,8 +3,8 @@ import { authCookiesSchema } from "../schemas";
 
 export const isLoggedIn = (req: Request): boolean => {
     const parsedCookies = authCookiesSchema.safeParse(req.cookies)
-    if(parsedCookies.success && parsedCookies.data.auth_token) {
-        console.log(`Redirecting from /login to / from auth_token = ${parsedCookies.data.auth_token}`);
+    if(parsedCookies.success && parsedCookies.data.authToken) {
+        console.log(`Redirecting from /login to / from auth_token = ${parsedCookies.data.authToken}`);
         return true
     }
     return false
@@ -15,7 +15,7 @@ export const getToken = (req: Request) => {
     if(!parsedToken.success){
         return "" 
     }
-    return parsedToken.data.auth_token
+    return parsedToken.data.authToken
 }
 
 export const getTokenHandler = (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const getTokenHandler = (req: Request, res: Response) => {
         res.json({errorMessage: "Auth token not set"})
         return
     }
-    res.json({auth_token: token})
+    res.json({authToken: token})
 }
 
 export const respondWithError = (res: Response, code: number, message: string) => {

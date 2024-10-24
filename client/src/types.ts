@@ -4,8 +4,8 @@ export type UserCredentials = {
 };
 
 export type User = {
-  auth_token: string
-  spotify_token: string
+  authToken: string
+  spotifyToken: string
   username: string
 } 
 
@@ -16,8 +16,22 @@ export interface Track {
   uri: string;
 }
 
+export type TrackData = {
+  title: string,
+  artist: string,
+  cover: string | undefined,
+  uri: string
+}
+
 export type Playlist = {
   cover: string | undefined,
   title: string,
-  uri: string
+  uri: string,
+  trackData: TrackData[]
 }
+
+export type PlaylistQuery = {
+  playlist_id: string,
+  fields?: string
+}
+

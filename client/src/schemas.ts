@@ -10,11 +10,11 @@ export const serverErrorSchema = z.object({
 })
 
 export const tokenResponseSchema = z.object({
-  auth_token: z.string()
+  authToken: z.string()
 }).or(serverErrorSchema)
 
 export const implicitLoginSchema = z.object({
-  auth_token: z.string(),
+  authToken: z.string(),
   username: z.string(),
 }).or(serverErrorSchema)
 
