@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 interface Props {
   uris: string[];
@@ -7,14 +8,10 @@ interface Props {
   setPlaylistUri: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export default function PlaylistsContainer({
-  uris,
-  className,
-  setPlaylistUri,
-}: Props) {
+export default function PlaylistsContainer({ uris, className, setPlaylistUri }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
-  const playlistQueries = uris.map((uri) => useGetPlaylistMinimumQuery(uri));
+  const playlistQueries = uris.map((uri) => useGetPlaylistMinimumQuery(uri ?? skipToken));
 
   return (
     <>

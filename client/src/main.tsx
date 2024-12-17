@@ -11,6 +11,7 @@ import Play from "./components/Play.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import Playlist from "./components/Playlist.tsx";
+import TrackDuel from "./components/TrackDuel.tsx";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,11 @@ const router = createBrowserRouter([
   {
     path: "/playlist",
     element: <Playlist />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/duel",
+    element: <TrackDuel />,
     errorElement: <ErrorPage />,
   },
 ]);

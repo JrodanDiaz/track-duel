@@ -33,9 +33,7 @@ export default function SexyButton({
         >
           {content}
         </span>
-        <span
-          className={`absolute inset-0 border-2 ${border} rounded-full`}
-        ></span>
+        <span className={`absolute inset-0 border-2 ${border} rounded-full`}></span>
       </button>
     </>
   );
