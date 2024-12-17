@@ -5,18 +5,13 @@ import BlackBackground from "./BlackBackground";
 import Player from "./Player";
 import { useEffect, useState } from "react";
 import useTrackSelection from "../hooks/useTrackSelection";
-
-/*
-On mount, randomly select X songs
-Use state variable to track which index we are on
-Once time is over or user guesses correctly, increment index
-*/
+import SexyButton from "./SexyButton";
 
 export default function TrackDuel() {
   const randomTracks = useTrackSelection();
   const playlist = usePlaylist();
   const navigate = useNavigate();
-  const [continueSignal, setContinueSignal] = useState<number>(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [answer, setAnswer] = useState("");
   const [previousAnswers, setPreviousAnswers] = useState<string[]>([]);
   const [correct, setCorrect] = useState<boolean>(false);
@@ -31,12 +26,12 @@ export default function TrackDuel() {
   }, [randomTracks, playlist]);
 
   useEffect(() => {
-    console.log(`ContinueSignal useEffect: ${continueSignal}`);
-  }, [continueSignal]);
+    console.log(`currentTrackIndex useEffect: ${currentTrackIndex}`);
+  }, [currentTrackIndex]);
 
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (answer === randomTracks[continueSignal].name) {
+    if (answer === randomTracks[currentTrackIndex].name) {
       setCorrect(true);
     } else {
       setPreviousAnswers((prev) => [...prev, answer]);
@@ -44,20 +39,23 @@ export default function TrackDuel() {
     }
   };
 
+  const selectNextSong = () => {
+    setAnswer("");
+    setCurrentTrackIndex((prev) => prev + 1);
+    setCorrect(false);
+  };
+
   return (
     <BlackBackground>
       <h1 className="text-3xl text-offwhite">TRACK DUEL</h1>
       <img src={playlist.images[0].url} height={150} width={150} />
-      <p
-        onClick={() => setContinueSignal((prev) => prev + 1)}
-        className="text-3xl text-main-pink"
-      >
-        Continue Signal: {continueSignal}
-      </p>
+      <button onClick={() => selectNextSong()} className="text-xl text-offwhite">
+        Select Next Song
+      </button>
       <p className="text-offwhite">{JSON.stringify(previousAnswers)}</p>
       <Player
         accessToken={getSpotifyToken()}
-        trackUri={randomTracks?.[continueSignal].uri}
+        trackUri={randomTracks?.[currentTrackIndex].uri}
       />
       {correct ? (
         <p className="text-3xl text-main-green">CORRECT ANSWER</p>
@@ -70,7 +68,13 @@ export default function TrackDuel() {
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
           />
-          <button type="submit">Submit</button>
+          <SexyButton
+            content="Submit"
+            bg="bg-main-green"
+            text="text-main-green"
+            border="border-main-green"
+            submit={true}
+          />
         </form>
       )}
     </BlackBackground>
