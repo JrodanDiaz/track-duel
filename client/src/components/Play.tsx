@@ -27,6 +27,7 @@ export default function Play() {
   }
 
   const [search, setSearch] = useState<string>("");
+  const [play, setPlay] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track>();
   const [selectedPlaylistUri, setSelectedPlaylistUri] = useState<string | undefined>();
@@ -120,7 +121,12 @@ export default function Play() {
         </>
       )}
       <div className={`${!playingTrack || search ? "hidden" : ""}`}>
-        <Player accessToken={getSpotifyToken()} trackUri={playingTrack?.uri} />
+        <Player
+          accessToken={getSpotifyToken()}
+          trackUri={playingTrack?.uri}
+          play={play}
+          setPlay={setPlay}
+        />
       </div>
       <div className="flex flex-wrap justify-evenly w-3/5">
         {searchResults.map((track, i) => (
