@@ -15,6 +15,7 @@ import { updatePlaylist } from "../store/state/playlistState";
 import { useNavigate } from "react-router-dom";
 import { getRandomSongSelection } from "../utils";
 import { updateTracks } from "../store/state/trackSelectionState";
+import { savePlaylist } from "../api/playlist";
 
 export default function Play() {
   const user = useUser();
@@ -32,6 +33,15 @@ export default function Play() {
   const [playingTrack, setPlayingTrack] = useState<Track>();
   const [selectedPlaylistUri, setSelectedPlaylistUri] = useState<string | undefined>();
   const [confirmedPlaylistUri, setConfirmedPlaylistUri] = useState<string | undefined>();
+  const [playlistUrl, setPlaylistUrl] = useState("");
+  const [savePlaylistSuccess, setSavePlaylistSuccess] = useState(false);
+
+  const handlePlaylistSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    savePlaylist(playlistUrl).then((success) => {
+      setSavePlaylistSuccess(success);
+    });
+  };
 
   const {
     data: playlistData,
@@ -102,6 +112,29 @@ export default function Play() {
       {playlistData && (
         <h1 className="text-xl text-lilac">Locked in playlist: {playlistData.name}</h1>
       )}
+      {savePlaylistSuccess ? (
+        <p className="text-xl text-green-600">SUCCESS</p>
+      ) : (
+        <p className="text-xl text-red-600">FAILURE</p>
+      )}
+      <form
+        onSubmit={handlePlaylistSubmit}
+        className="border-2 border-gray-600 rounded-lg p-5"
+      >
+        <input
+          type="text"
+          placeholder="Enter Playlist URL"
+          className=" focus:outline-none px-5 py-3"
+          value={playlistUrl}
+          onChange={(e) => setPlaylistUrl(e.target.value)}
+        />
+        <button
+          className="border-2 border-lilac rounded-xl px-5 py-3 bg-transparent text-lilac"
+          type="submit"
+        >
+          Save Playlist
+        </button>
+      </form>
       <input
         type="text"
         placeholder="Enter track..."
