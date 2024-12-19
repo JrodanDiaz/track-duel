@@ -18,13 +18,13 @@ export const loginHandler = async (req: Request, res: Response) => {
         return
     }
 
-    const loginSuccess = await validateUser(parsedBody.data)
-    if(!loginSuccess){
+    const [loginSuccess, userId] = await validateUser(parsedBody.data)
+    if(!loginSuccess || userId === null){
         res.status(401).send("Invalid credentials")
         return
     }
     
-    const jwt = createJwt(parsedBody.data.username)
+    const jwt = createJwt(parsedBody.data.username, userId)
     res.cookie("authToken", jwt, jwtCookieOptions)
     res.status(200).json({authToken: jwt, username: parsedBody.data.username})
 }

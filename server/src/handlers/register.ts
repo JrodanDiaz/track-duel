@@ -13,12 +13,12 @@ export const registerHandler = async (req: Request, res: Response) => {
     return
   }
 
-  const userCreated = await createUser(validBody.data)
-  if(!userCreated) {
+  const [userCreated, userId] = await createUser(validBody.data)
+  if(!userCreated || userId === null) {
     res.status(409).send("User already exists")
     return
   }
-  const jwt = createJwt(validBody.data.username);
+  const jwt = createJwt(validBody.data.username, userId);
   console.log(`JWT generated: ${jwt}`);
   
   res.cookie("authToken", jwt, jwtCookieOptions)
