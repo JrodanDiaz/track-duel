@@ -19,9 +19,14 @@ export default function TrackDuel() {
   const [previousAnswers, setPreviousAnswers] = useState<string[]>([]);
   const [correct, setCorrect] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
+
   if (!randomTracks) {
     console.error("Playlist is undefined");
   }
+
+  const isCorrectAnswer = (answer: string) =>
+    answer.trim().toLowerCase() ===
+    randomTracks[currentTrackIndex].name.toLowerCase().split("-")[0].trim();
 
   useEffect(() => {
     if (!randomTracks[0].name || !playlist) {
@@ -37,23 +42,20 @@ export default function TrackDuel() {
 
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      answer.trim().toLowerCase() ===
-      randomTracks[currentTrackIndex].name.toLowerCase().split("-")[0].trim()
-    ) {
+    setAnswer("");
+    if (isCorrectAnswer(answer)) {
       setCorrect(true);
-      setAnswer("");
       setPlay(false);
       const elapsedTime = Date.now() - startTime;
       setElapsedTime(elapsedTime);
       setScore((prevScore) => prevScore + 100 - Math.round(elapsedTime / 1000));
     } else {
       setPreviousAnswers((prev) => [...prev, answer]);
-      setAnswer("");
     }
   };
 
   const selectNextSong = () => {
+    if (currentTrackIndex >= randomTracks.length - 1) return;
     setAnswer("");
     setCurrentTrackIndex((prev) => prev + 1);
     setCorrect(false);
