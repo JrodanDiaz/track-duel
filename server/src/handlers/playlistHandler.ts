@@ -57,13 +57,17 @@ export const getSavedPlaylistsHandler = async (req: Request, res: Response) => {
         return;
     }
 
-    const savedPlaylists = await getSavedPlaylists(userId, parseInt(offset as string));
+    const [userHasNoSavedPlaylists, savedPlaylists ] = await getSavedPlaylists(userId, parseInt(offset as string));
+    if(userHasNoSavedPlaylists) {
+        respondWithError(res, 404, "User Has No Saved Playlists")
+        return
+    }
     if (savedPlaylists === undefined) {
         respondWithError(res, 500, "Internal Server Error");
         return;
     }
     if (savedPlaylists.length === 0) {
-        respondWithError(res, 400, "User Has No (More) Saved Playlists");
+        respondWithError(res, 400, "User Has No More Saved Playlists");
         return;
     }
     console.log(`User ${userId}'s Playlists: ${JSON.stringify(savedPlaylists)}`);

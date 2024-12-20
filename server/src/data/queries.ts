@@ -112,12 +112,12 @@ export const getPlaylists = async () => {
   }
 
 }
-export const getSavedPlaylists = async (userId: number, offset: number): Promise<DB_PLAYLISTS_ROW[] | undefined> => {
+export const getSavedPlaylists = async (userId: number, offset: number): Promise<[userHasNoSavedPlaylists: boolean | undefined, playlists: DB_PLAYLISTS_ROW[] | undefined]> => {
   try {
     const result = await pg_pool.query<DB_PLAYLISTS_ROW>("SELECT playlist_url FROM playlists WHERE user_id = $1 LIMIT 3 OFFSET $2", [userId, offset])
-    return result.rows
+    return [offset === 0 && result.rows.length === 0, result.rows]
   } catch(err) {
     console.log(`Error in getSavedPlaylists: ${err}`);
-    return
+    return [undefined, undefined]
   }
 }

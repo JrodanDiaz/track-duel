@@ -9,7 +9,7 @@ const playlistMinimumFields = "name,images(url)"
 export const spotifyApiSlice = createApi({
   reducerPath: "spotifyApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${SpotifyApiEndpoint}`,
+    baseUrl: SpotifyApiEndpoint,
     headers: {Authorization: `Bearer ${getSpotifyToken()}`}
   }),
   endpoints: (builder) => ({

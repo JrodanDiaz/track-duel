@@ -22,7 +22,7 @@ import { getSavedPlaylists, savePlaylist } from "../api/playlist";
  if press load more, use a state variable and add it to the offset
  */
 
-const NO_MORE_PLAYLISTS_ERRMSG = "User Has No (More) Saved Playlists";
+const NO_MORE_PLAYLISTS_ERRMSG = "User Has No More Saved Playlists";
 
 export default function Play() {
     const user = useUser();
@@ -38,10 +38,13 @@ export default function Play() {
         string | undefined
     >();
     const [playlistUrl, setPlaylistUrl] = useState("");
-    const [savePlaylistSuccess, setSavePlaylistSuccess] = useState(false);
+    const [savePlaylistSuccess, setSavePlaylistSuccess] = useState<boolean | undefined>(
+        undefined
+    );
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
-    const [offset, setOffset] = useState(0);
+    const [offset, setOffset] = useState(savedPlaylists.length);
+    const [reloadPlaylistsSignal, updateReloadPlaylistsSignal] = useState(1);
 
     console.log(`savedPlaylists = ${savedPlaylists}, offset = ${offset}`);
 
@@ -51,25 +54,12 @@ export default function Play() {
         isSuccess,
     } = useGetPlaylistEssentialsQuery(confirmedPlaylistUri ?? skipToken);
 
-    // if (!isLoggedIn(user)) {
-    //     window.location.href = "/";
-    //     return;
-    // }
-
     useEffect(() => {
         if (!isLoggedIn(user)) {
             navigate("/");
         }
     }, [user]);
 
-    // if (isSuccess) {
-    //     dispatch(updatePlaylist(playlistData));
-    //     const randomSelection = getRandomSongSelection(playlistData);
-    //     dispatch(updateTracks(randomSelection));
-    //     navigate("/duel");
-    // }
-
-    //MR. GPT
     useEffect(() => {
         if (isSuccess) {
             dispatch(updatePlaylist(playlistData));
@@ -83,11 +73,18 @@ export default function Play() {
         e.preventDefault();
         savePlaylist(playlistUrl).then((success) => {
             setSavePlaylistSuccess(success);
+            if (success) {
+                setSavedPlaylistsError("");
+                setSavePlaylistSuccess(undefined);
+                setOffset(savedPlaylists.length);
+                updateReloadPlaylistsSignal((signal) => signal + 1);
+            }
+            setPlaylistUrl("");
         });
     };
 
     const incrementOffset = () => {
-        setOffset((prev) => prev + 3);
+        setOffset(savedPlaylists.length);
     };
 
     const spotifyApi = new SpotifyWebApi({
@@ -100,21 +97,26 @@ export default function Play() {
         setSearch("");
     }
 
-    // might want to introduce a signal that prevents further http requests if user has no more saved playlists
     useEffect(() => {
-        getSavedPlaylists(offset).then(([playlists, errorMessage]) => {
-            if (errorMessage) {
-                setSavedPlaylistsError(errorMessage);
-            } else if (playlists === undefined) {
-                setSavedPlaylistsError("Internal Server Error");
-            } else {
-                //this dumb hack ensures that the array has no duplicate elements thanks to React Strict Mode
-                setSavedPlaylists((prev) =>
-                    prev.length === 0 ? playlists : [...new Set([...prev, ...playlists])]
-                );
+        getSavedPlaylists({ offset: offset }).then(
+            ([noSavedPlaylists, playlists, errorMessage]) => {
+                if (noSavedPlaylists) {
+                    return;
+                } else if (errorMessage) {
+                    setSavedPlaylistsError(errorMessage);
+                } else if (playlists === undefined) {
+                    setSavedPlaylistsError("Internal Server Error");
+                } else {
+                    //this dumb hack ensures that the array has no duplicate elements thanks to React Strict Mode
+                    const updatedPlaylists =
+                        savedPlaylists.length === 0
+                            ? playlists
+                            : [...new Set([...savedPlaylists, ...playlists])];
+                    setSavedPlaylists(updatedPlaylists);
+                }
             }
-        });
-    }, [offset]);
+        );
+    }, [offset, reloadPlaylistsSignal]);
 
     useEffect(() => {
         if (!search) return setSearchResults([]);
@@ -152,20 +154,29 @@ export default function Play() {
             {getSavedPlaylistsError && (
                 <p className="text-xl text-red-700">{getSavedPlaylistsError}</p>
             )}
+            <p className=" text-blue-700 text-xl">Offset: {offset}</p>
+            <p className=" text-blue-400 text-xl">
+                SavedPlaylists Length: {savedPlaylists.length}
+            </p>
+            <p className=" text-blue-200 text-xl">
+                Reload Signal: {reloadPlaylistsSignal}
+            </p>
             {savedPlaylists.length > 0 && (
-                <PlaylistsContainer
-                    className="flex flex-wrap p-2"
-                    uris={savedPlaylists}
-                    setPlaylistUri={setSelectedPlaylistUri}
-                />
+                <>
+                    <PlaylistsContainer
+                        className="flex flex-wrap p-2"
+                        uris={savedPlaylists}
+                        setPlaylistUri={setSelectedPlaylistUri}
+                    />
+                    <button
+                        onClick={incrementOffset}
+                        className={`border-2 border-lilac text-lilac bg-transparent rounded-lg px-5 py-2 disabled:border-gray-500 disabled:text-gray-500`}
+                        disabled={getSavedPlaylistsError === NO_MORE_PLAYLISTS_ERRMSG}
+                    >
+                        Load More Playlists
+                    </button>
+                </>
             )}
-            <button
-                onClick={incrementOffset}
-                className={`border-2 border-lilac text-lilac bg-transparent rounded-lg px-5 py-2 disabled:border-gray-500 disabled:text-gray-500`}
-                disabled={getSavedPlaylistsError === NO_MORE_PLAYLISTS_ERRMSG}
-            >
-                Load More Playlists
-            </button>
             {selectedPlaylistUri && (
                 <>
                     <button
@@ -181,10 +192,8 @@ export default function Play() {
                     Locked in playlist: {playlistData.name}
                 </h1>
             )}
-            {savePlaylistSuccess ? (
-                <p className="text-xl text-green-600">SUCCESS</p>
-            ) : (
-                <p className="text-xl text-red-600">FAILURE</p>
+            {savePlaylistSuccess === false && (
+                <p className="text-xl text-red-700">Error While Saving Playlist</p>
             )}
             <form
                 onSubmit={handlePlaylistSubmit}
