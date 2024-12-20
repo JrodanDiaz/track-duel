@@ -22,6 +22,8 @@ import { getSavedPlaylists, savePlaylist } from "../api/playlist";
  if press load more, use a state variable and add it to the offset
  */
 
+const NO_MORE_PLAYLISTS_ERRMSG = "User Has No (More) Saved Playlists";
+
 export default function Play() {
     const user = useUser();
     const dispatch = useAppDispatch();
@@ -159,9 +161,10 @@ export default function Play() {
             )}
             <button
                 onClick={incrementOffset}
-                className="border-2 border-lilac text-lilac bg-transparent rounded-lg px-5 py-2"
+                className={`border-2 border-lilac text-lilac bg-transparent rounded-lg px-5 py-2 disabled:border-gray-500 disabled:text-gray-500`}
+                disabled={getSavedPlaylistsError === NO_MORE_PLAYLISTS_ERRMSG}
             >
-                Increase Offset: {offset}
+                Load More Playlists
             </button>
             {selectedPlaylistUri && (
                 <>

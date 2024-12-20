@@ -63,7 +63,7 @@ export const getSavedPlaylistsHandler = async (req: Request, res: Response) => {
         return;
     }
     if (savedPlaylists.length === 0) {
-        respondWithError(res, 400, "User Has No Saved Playlists");
+        respondWithError(res, 400, "User Has No (More) Saved Playlists");
         return;
     }
     console.log(`User ${userId}'s Playlists: ${JSON.stringify(savedPlaylists)}`);
