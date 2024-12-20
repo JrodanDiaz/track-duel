@@ -12,3 +12,9 @@ export type DB_USERS_ROW = {
     username: string,
     passhash: string
 }
+
+export type DB_PLAYLISTS_ROW = {
+    playlist_id: number,
+    user_id: number,
+    playlist_url: string
+}

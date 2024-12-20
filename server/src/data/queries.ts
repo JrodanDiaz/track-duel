@@ -1,5 +1,5 @@
 import { pg_pool } from "./pg-pool";
-import { UserCredentials, ErrorMessage, DB_USERS_ROW } from "../types";
+import { UserCredentials, ErrorMessage, DB_USERS_ROW, DB_PLAYLISTS_ROW } from "../types";
 import { hash, verify } from "../encryption";
 import { QueryResult } from "pg";
 
@@ -109,5 +109,15 @@ export const getPlaylists = async () => {
   } catch(err) {
     console.log(`Error in getPlaylists: ${err}`);
     
+  }
+
+}
+export const getSavedPlaylists = async (userId: number, offset: number): Promise<DB_PLAYLISTS_ROW[] | undefined> => {
+  try {
+    const result = await pg_pool.query<DB_PLAYLISTS_ROW>("SELECT playlist_url FROM playlists WHERE user_id = $1 LIMIT 3 OFFSET $2", [userId, offset])
+    return result.rows
+  } catch(err) {
+    console.log(`Error in getSavedPlaylists: ${err}`);
+    return
   }
 }
