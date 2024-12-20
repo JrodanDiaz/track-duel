@@ -106,10 +106,10 @@ export default function Play() {
             } else if (playlists === undefined) {
                 setSavedPlaylistsError("Internal Server Error");
             } else {
-                setSavedPlaylists(playlists);
-                // setSavedPlaylists((prev) =>
-                //     prev.length === 0 ? playlists : [...prev, ...playlists]
-                // );
+                //this dumb hack ensures that the array has no duplicate elements thanks to React Strict Mode
+                setSavedPlaylists((prev) =>
+                    prev.length === 0 ? playlists : [...new Set([...prev, ...playlists])]
+                );
             }
         });
     }, [offset]);
@@ -133,18 +133,6 @@ export default function Play() {
         }, 500);
         return () => clearTimeout(timerId);
     }, [search]);
-
-    // if (!isLoggedIn(user)) {
-    //     window.location.href = "/";
-    //     return null;
-    // }
-
-    // if (isSuccess) {
-    //     dispatch(updatePlaylist(playlistData));
-    //     const randomSelection = getRandomSongSelection(playlistData);
-    //     dispatch(updateTracks(randomSelection));
-    //     navigate("/duel");
-    // }
 
     let content: React.ReactNode;
 

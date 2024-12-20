@@ -14,47 +14,42 @@ import Playlist from "./components/Playlist.tsx";
 import TrackDuel from "./components/TrackDuel.tsx";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-    errorElement: <ErrorPage />,
-    // loader: rootLoader,
-    // children: [
-    //   {
-    //     path: "team",
-    //     element: <Team />,
-    //     loader: teamLoader,
-    //   },
-    // ],
-  },
-  {
-    path: "/register",
-    element: <UnAuthGuard element={<RegisterPage />} />,
-  },
-  {
-    path: "/login",
-    element: <UnAuthGuard element={<LoginPage />} />,
-  },
-  {
-    path: "/play",
-    element: <Play />,
-  },
-  {
-    path: "/playlist",
-    element: <Playlist />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/duel",
-    element: <TrackDuel />,
-    errorElement: <ErrorPage />,
-  },
+    {
+        path: "/",
+        element: <Root />,
+        errorElement: <ErrorPage />,
+        // loader: rootLoader,
+        // children: [
+        //   {
+        //     path: "team",
+        //     element: <Team />,
+        //     loader: teamLoader,
+        //   },
+        // ],
+    },
+    {
+        path: "/register",
+        element: <UnAuthGuard element={<RegisterPage />} />,
+    },
+    {
+        path: "/login",
+        element: <UnAuthGuard element={<LoginPage />} />,
+    },
+    {
+        path: "/play",
+        element: <Play />,
+    },
+    {
+        path: "/duel",
+        element: <TrackDuel />,
+        errorElement: <ErrorPage />,
+    },
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  </StrictMode>
+    <StrictMode>
+        <Provider store={store}>
+            <RouterProvider router={router} />
+        </Provider>
+    </StrictMode>
 );

@@ -1,26 +1,41 @@
-import usePlaylist from "../hooks/usePlaylist";
-import BlackBackground from "./BlackBackground";
+import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
-export default function Playlist() {
-  const playlist = usePlaylist();
-  return (
-    <>
-      <BlackBackground>
-        <div className="w-full flex flex-col justify-center items-center">
-          <img
-            src={playlist.images[0].url}
-            alt="Playlist Cover"
-            height={150}
-            width={150}
-          />
-          <h1 className=" text-offwhite text-3xl">{playlist.name}</h1>
-          {playlist.tracks.items.map((item) => (
-            <p className=" text-offwhite text-xl">
-              {item.track.name} on {item.track.album.name}
-            </p>
-          ))}
+interface Props {
+    uri: string;
+    index: number;
+    selectedIndex: number | null;
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+    classname?: string;
+}
+
+export default function Playlist({
+    uri,
+    index,
+    selectedIndex,
+    setSelectedIndex,
+    classname = "",
+}: Props) {
+    const { data, isLoading, error } = useGetPlaylistMinimumQuery(uri ?? skipToken);
+
+    if (isLoading) return <div className=" text-lilac">Loading playlist...</div>;
+
+    if (error || data === undefined)
+        return <div className=" text-red-500">Error fetching playlist</div>;
+
+    return (
+        <div
+            className={`flex flex-col flex-wrap gap-4 justify-evenly items-center cursor-pointer ${
+                selectedIndex === index && "border-2 border-lilac"
+            } ${classname}`}
+            onClick={() => {
+                setSelectedIndex(index);
+            }}
+        >
+            {data.images[0].url && (
+                <img src={data.images[0].url} height={150} width={150} />
+            )}
+            <p className=" text-offwhite">{data.name}</p>
         </div>
-      </BlackBackground>
-    </>
-  );
+    );
 }
