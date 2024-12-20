@@ -6,6 +6,7 @@ interface Props {
   content: string;
   px?: string;
   py?: string;
+  submit?: boolean;
 }
 export default function SexyButton({
   onClick,
@@ -15,12 +16,14 @@ export default function SexyButton({
   content,
   px = "px-5",
   py = "py-3",
+  submit = false,
 }: Props) {
   return (
     <>
       <button
         onClick={onClick}
         className={`relative inline-flex items-center justify-start inline-block ${px} ${py} overflow-hidden font-bold rounded-full group`}
+        type={submit ? "submit" : "button"}
       >
         <span
           className={`w-32 h-32 rotate-45 translate-x-12 -translate-y-2 absolute left-0 top-0 ${bg} opacity-[3%]`}
@@ -33,9 +36,7 @@ export default function SexyButton({
         >
           {content}
         </span>
-        <span
-          className={`absolute inset-0 border-2 ${border} rounded-full`}
-        ></span>
+        <span className={`absolute inset-0 border-2 ${border} rounded-full`}></span>
       </button>
     </>
   );

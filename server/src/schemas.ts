@@ -17,5 +17,14 @@ export const spotifyTokenSchema = z.object({
   scope: z.string(),
 });
 
+export const createPlaylistSchema = z.object({
+  playlistUrl: z.string()
+})
+
+export const jwtPayload = z.object({
+  sub: z.string(),
+  id: z.number()
+})
+
 export type SpotifyAuthRes = z.infer<typeof spotifyTokenSchema>
   

@@ -2,16 +2,16 @@ interface Image {
   url: string;
 }
 
-interface Album {
+export interface Album {
   images: Image[];
   name: string;
 }
 
-interface Artist {
+export interface Artist {
   name: string;
 }
 
-interface Track {
+export interface Track {
   album: Album;
   artists: Artist[];
   name: string;

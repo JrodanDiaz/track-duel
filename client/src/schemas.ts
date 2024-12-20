@@ -18,3 +18,5 @@ export const implicitLoginSchema = z.object({
   username: z.string(),
 }).or(serverErrorSchema)
 
+export const getSavedPlaylistsSchema = z.array(z.string()).or(serverErrorSchema)
+

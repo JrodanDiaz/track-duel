@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
+import { SetStateAction } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 
 interface PlayerProps {
   accessToken: string;
   trackUri: string | undefined;
+  play: boolean;
+  setPlay: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export default function Player({ accessToken, trackUri }: PlayerProps) {
-  const [play, setPlay] = useState(false);
-
-  useEffect(() => setPlay(false), [trackUri]);
-
+export default function Player({ accessToken, trackUri, play, setPlay }: PlayerProps) {
   if (!accessToken) return null;
   return (
     <>
@@ -26,7 +24,6 @@ export default function Player({ accessToken, trackUri }: PlayerProps) {
       <div className=" hidden">
         <SpotifyPlayer
           token={accessToken}
-          // showSaveIcon
           callback={(state) => {
             if (!state.isPlaying) setPlay(false);
           }}

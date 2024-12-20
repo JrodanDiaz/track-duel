@@ -1,60 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
+import Playlist from "./Playlist";
 
 interface Props {
-  uris: string[];
-  className?: string;
-  setPlaylistUri: React.Dispatch<React.SetStateAction<string | undefined>>;
+    uris: string[];
+    className?: string;
+    setPlaylistUri: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export default function PlaylistsContainer({
-  uris,
-  className,
-  setPlaylistUri,
-}: Props) {
-  const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
+export default function PlaylistsContainer({ uris, className, setPlaylistUri }: Props) {
+    const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
-  const playlistQueries = uris.map((uri) => useGetPlaylistMinimumQuery(uri));
+    useEffect(() => {
+        if (selectedIndex !== null) {
+            setPlaylistUri(uris[selectedIndex]);
+        }
+    }, [selectedIndex]);
 
-  return (
-    <>
-      <div className={className}>
-        {playlistQueries.map((query, index) => {
-          const { data: playlist, isLoading, error } = query;
-
-          if (isLoading)
-            return (
-              <div key={index} className=" text-lilac">
-                Loading playlist {index + 1}...
-              </div>
-            );
-
-          if (error || playlist === undefined)
-            return (
-              <div key={index} className=" text-red-500">
-                Error fetching playlist {index + 1}
-              </div>
-            );
-
-          return (
-            <div
-              key={`${index}-${playlist.name}`}
-              className={`flex flex-col flex-wrap gap-4 justify-evenly items-center cursor-pointer ${
-                index === selectedIndex && "border-2 border-lilac"
-              }`}
-              onClick={() => {
-                setSelectedIndex(index);
-                setPlaylistUri(uris[index]);
-              }}
-            >
-              {playlist.images[0].url && (
-                <img src={playlist.images[0].url} height={150} width={150} />
-              )}
-              <p className=" text-offwhite">{playlist.name}</p>
+    return (
+        <>
+            <div className={className}>
+                {uris.map((uri, index) => (
+                    <Playlist
+                        uri={uri}
+                        index={index}
+                        selectedIndex={selectedIndex}
+                        setSelectedIndex={setSelectedIndex}
+                    />
+                ))}
             </div>
-          );
-        })}
-      </div>
-    </>
-  );
+        </>
+    );
 }

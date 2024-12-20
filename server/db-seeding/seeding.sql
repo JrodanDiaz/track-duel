@@ -8,15 +8,15 @@ INSERT INTO
 VALUES
     (
         'jordan',
-        'Shrekt123'
+        'jordan'
     ),
     (
         'bourbon',
-        'Necromancy'
+        'bourbon'
     ),
     (
-        'darklordpge',
-        'soaked-in-honey'
+        'pge',
+        'pge'
     );
 
 \echo 'finished seeding db GOD'

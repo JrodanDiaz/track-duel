@@ -8,6 +8,7 @@ import { spotifyLoginHandler, spotifyCallbackHandler } from "./handlers/spotifyH
 import dotenv from "dotenv"
 import { implicitLoginHandler } from "./handlers/implicit_login";
 import { getTokenHandler } from "./auth/utils";
+import { createPlaylistHandler, getSavedPlaylistsHandler, revealPlaylistsHandler } from "./handlers/playlistHandler";
 
 dotenv.config()
 const app = express();
@@ -38,6 +39,10 @@ app.get("/implicit_login", implicitLoginHandler)
 
 app.get("/spotify", spotifyLoginHandler)
 app.get('/auth/callback', spotifyCallbackHandler )
+
+app.get("/playlist", getSavedPlaylistsHandler)
+app.post("/playlist", createPlaylistHandler)
+app.get("/playlists/reveal", revealPlaylistsHandler)
 
 
 app.listen(port, () => {

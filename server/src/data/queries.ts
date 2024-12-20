@@ -1,5 +1,5 @@
 import { pg_pool } from "./pg-pool";
-import { UserCredentials, ErrorMessage, DB_USERS_ROW } from "../types";
+import { UserCredentials, ErrorMessage, DB_USERS_ROW, DB_PLAYLISTS_ROW } from "../types";
 import { hash, verify } from "../encryption";
 import { QueryResult } from "pg";
 
@@ -43,17 +43,18 @@ export const userExists = async (username: string): Promise<boolean> => {
   return res.rows.length !== 0;
 };
 
-export const createUser = async (user: UserCredentials): Promise<boolean> => {
+export const createUser = async (user: UserCredentials): Promise<[success: boolean, userId: number | null]> => {
   const passhash = await hash(user.password)
   try {
-    await pg_pool.query(
-      "INSERT INTO users (username, passhash) VALUES ($1, $2)",
+    const result = await pg_pool.query<DB_USERS_ROW>(
+      "INSERT INTO users (username, passhash) VALUES ($1, $2) RETURNING id",
       [user.username, passhash]
     );
-    return true
+    
+    return [true, result.rows[0].id]
   } catch(err) {
     console.log(`err in createUser: ${err}`);
-    return false 
+    return [false, null] 
   }
 };
 
@@ -68,23 +69,14 @@ export const getUserIdFromUsername = async (
   return res.rows[0].id as string;
 };
 
-export const validateUser = async (user: UserCredentials): Promise<boolean> => {
-  const users: QueryResult<DB_USERS_ROW> = await pg_pool.query("SELECT passhash FROM users where username = $1", [user.username])
+export const validateUser = async (user: UserCredentials): Promise<[success: boolean, id: number | null]> => {
+  const users: QueryResult<DB_USERS_ROW> = await pg_pool.query("SELECT passhash, id FROM users where username = $1", [user.username])
   if(users.rows.length === 0) {
-    return false
+    return [false, null]
   }
-  return await verify(user.password, users.rows[0].passhash)
+  const isVerified = await verify(user.password, users.rows[0].passhash)
+  return [isVerified, users.rows[0].id]
 }
-
-// export const createTable = async () => {
-//   try {
-//     const res = await pg_pool.query(
-//       "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username VARCHAR(100) NOT NULL, passhash VARCHAR(100) NOT NULL)"
-//     );
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
 
 export const clearTable = async () => {
   try {
@@ -92,5 +84,40 @@ export const clearTable = async () => {
   } catch(err){
     console.log(`err occurred in clearTable: ${err}`);
     
+  }
+}
+
+export const savePlaylist = async (user_id: number, url: string): Promise<boolean> => {
+  try {
+    await pg_pool.query("INSERT INTO playlists (user_id, playlist_url) VALUES ($1, $2)", [user_id, url])
+    return true
+  } catch(err) {
+    console.log(`Error saving playlist: ${err}`);
+    return false
+  }
+}
+
+export const getPlaylists = async () => {
+  try {
+    const result = await pg_pool.query("SELECT * FROM playlists")
+    if(result.rows.length === 0) {
+      console.log("playlists table is empty");
+    }
+    
+    return result.rows
+
+  } catch(err) {
+    console.log(`Error in getPlaylists: ${err}`);
+    
+  }
+
+}
+export const getSavedPlaylists = async (userId: number, offset: number): Promise<[userHasNoSavedPlaylists: boolean | undefined, playlists: DB_PLAYLISTS_ROW[] | undefined]> => {
+  try {
+    const result = await pg_pool.query<DB_PLAYLISTS_ROW>("SELECT playlist_url FROM playlists WHERE user_id = $1 LIMIT 3 OFFSET $2", [userId, offset])
+    return [offset === 0 && result.rows.length === 0, result.rows]
+  } catch(err) {
+    console.log(`Error in getSavedPlaylists: ${err}`);
+    return [undefined, undefined]
   }
 }
