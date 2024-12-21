@@ -15,7 +15,7 @@ import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice
 import { updatePlaylist } from "../../store/state/playlistState";
 import { updateTracks } from "../../store/state/trackSelectionState";
 import { Track } from "../../types";
-import { getRandomSongSelection } from "../../utils";
+import { generateRoomCode, getRandomSongSelection } from "../../utils";
 
 /*
  on mount, get first x playlists from this user id.
@@ -191,14 +191,11 @@ export default function Play() {
             {savePlaylistSuccess === false && (
                 <p className="text-xl text-red-700">Error While Saving Playlist</p>
             )}
-            <form
-                onSubmit={handlePlaylistSubmit}
-                className="border-2 border-gray-600 rounded-lg p-5"
-            >
+            <form onSubmit={handlePlaylistSubmit} className="p-5">
                 <input
                     type="text"
                     placeholder="Enter Playlist URL"
-                    className=" focus:outline-none px-5 py-3"
+                    className=" focus:outline-none px-5 py-3 bg-transparent border-2 border-lilac text-offwhite"
                     value={playlistUrl}
                     onChange={(e) => setPlaylistUrl(e.target.value)}
                 />

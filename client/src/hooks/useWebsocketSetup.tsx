@@ -13,8 +13,6 @@ export default function useWebsocketSetup() {
     const user = useUser();
 
     const handleMessage = (message: MessageEvent) => {
-        console.log(`Received message: ${message}`);
-
         const parsedMessage = socketResponseSchema.safeParse(JSON.parse(message.data));
         if (!parsedMessage.success) {
             console.log(`Error parsing socket response: ${parsedMessage.error}`);
@@ -37,8 +35,17 @@ export default function useWebsocketSetup() {
                     },
                 ]);
                 break;
+            case SocketResponse.RoomJoined:
+                console.log(
+                    `Successfully connected to room ${parsedMessage.data.roomCode}`
+                );
+                break;
+            case SocketResponse.Error:
+                console.log(`Error Socket Response: ${parsedMessage.data.message}`);
+                break;
             default:
                 console.log("Default in SocketResponse Switch. How did we get here...");
+                console.log(`${JSON.stringify(parsedMessage.data)}`);
         }
     };
 
@@ -61,15 +68,23 @@ export default function useWebsocketSetup() {
     }, []);
 
     return {
+        loading,
         sendAnswer: (answer: string) => {
             socketRef.current?.send(
                 JSON.stringify({ type: "Answer", from: user.username, answer: answer })
             );
         },
-        loading,
         answers,
         resetAnswers: () => {
             setAnswers([]);
+        },
+        joinRoom: (roomCode: string) => {
+            socketRef.current?.send(
+                JSON.stringify({
+                    type: "join-room",
+                    roomCode: roomCode,
+                })
+            );
         },
     };
 }

@@ -7,6 +7,7 @@ import useWebsocketSetup from "../../hooks/useWebsocketSetup";
 import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
 import Player from "../home/Player";
+import Input from "../common/Input";
 
 export default function TrackDuel() {
     const randomTracks = useTrackSelection();
@@ -19,6 +20,7 @@ export default function TrackDuel() {
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
     const [score, setScore] = useState<number>(0);
+    const [roomCode, setRoomCode] = useState("");
     const { sendAnswer, loading, answers, resetAnswers } = useWebsocketSetup();
 
     if (!randomTracks) {
@@ -68,7 +70,7 @@ export default function TrackDuel() {
     return (
         <BlackBackground>
             <div className="flex flex-col items-center">
-                <h1 className="text-3xl text-offwhite">TRACK DUEL</h1>
+                <h1 className="text-5xl font-bebas text-offwhite my-6">TRACK DUEL</h1>
                 {loading && <p className="text-offwhite">Establishing connection...</p>}
                 <img src={playlist.images[0].url} height={150} width={150} />
                 <button
@@ -77,14 +79,12 @@ export default function TrackDuel() {
                 >
                     Select Next Song
                 </button>
-                <p className="text-red-600 text-xl">
-                    Play State: {play ? "True" : "False"}
-                </p>
                 <p className="text-xl text-red-700">Score: {score}</p>
-                <p className="text-xl text-main-pink">Start Time: {startTime}</p>
-                <p className="text-xl text-main-pink">
-                    Elapsed Time Seconds: {elapsedTime / 1000}
-                </p>
+                <Input
+                    placeholder="Enter Room Code"
+                    value={roomCode}
+                    onChange={setRoomCode}
+                />
                 <Player
                     accessToken={getSpotifyToken()}
                     trackUri={randomTracks?.[currentTrackIndex].uri}

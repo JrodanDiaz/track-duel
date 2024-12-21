@@ -29,7 +29,7 @@ export default function Playlist({
                 selectedIndex === index && "border-2 border-lilac"
             } ${classname}`}
             onClick={() => {
-                setSelectedIndex(index);
+                setSelectedIndex(index === selectedIndex ? null : index);
             }}
         >
             {data.images[0].url && (

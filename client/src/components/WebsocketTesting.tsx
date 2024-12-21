@@ -1,10 +1,12 @@
 import { useState } from "react";
 import useWebsocketSetup from "../hooks/useWebsocketSetup";
 import BlackBackground from "./common/BlackBackground";
+import Input from "./common/Input";
 
 export default function WebsocketTesting() {
-    const { sendAnswer, loading, answers } = useWebsocketSetup();
+    const { sendAnswer, loading, answers, joinRoom } = useWebsocketSetup();
     const [answer, setAnswer] = useState("");
+    const [roomCode, setRoomCode] = useState("");
     return (
         <BlackBackground>
             <div className="flex flex-col items-center justify-center">
@@ -22,6 +24,18 @@ export default function WebsocketTesting() {
                 >
                     Send Message
                 </button>
+                <Input
+                    placeholder="Enter Room Code"
+                    value={roomCode}
+                    onChange={setRoomCode}
+                />
+                <button
+                    onClick={() => joinRoom(roomCode)}
+                    className=" text-lilac border-2 border-lilac px-5 py-2 bg-transparent"
+                >
+                    Join Room
+                </button>
+
                 {answers.length > 0 &&
                     answers.map((ans) => (
                         <p className="text-offwhite">

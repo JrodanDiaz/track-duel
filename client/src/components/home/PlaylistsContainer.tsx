@@ -11,9 +11,7 @@ export default function PlaylistsContainer({ uris, className, setPlaylistUri }: 
     const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
     useEffect(() => {
-        if (selectedIndex !== null) {
-            setPlaylistUri(uris[selectedIndex]);
-        }
+        setPlaylistUri(selectedIndex === null ? undefined : uris[selectedIndex]);
     }, [selectedIndex]);
 
     return (

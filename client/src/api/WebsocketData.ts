@@ -1,4 +1,6 @@
 export const SocketResponse = {
     Ping: "Ping",
-    Answer: "Answer"
+    Answer: "Answer",
+    Error: "error",
+    RoomJoined: "room-joined"
 }

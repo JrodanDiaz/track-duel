@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { registerHandler } from "./handlers/register";
@@ -15,6 +15,7 @@ import {
 } from "./handlers/playlistHandler";
 import { createServer} from "http";
 import { configureWebsocketServer } from "./websockets";
+import { generateRoomHandler } from "./handlers/roomHandler";
 
 dotenv.config();
 const app = express();
@@ -53,6 +54,9 @@ app.get("/auth/callback", spotifyCallbackHandler);
 app.get("/playlist", getSavedPlaylistsHandler);
 app.post("/playlist", createPlaylistHandler);
 app.get("/playlists/reveal", revealPlaylistsHandler);
+
+app.get('/generate-room', generateRoomHandler);
+  
 
 server.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
