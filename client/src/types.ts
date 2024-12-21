@@ -35,3 +35,8 @@ export type PlaylistQuery = {
   fields?: string
 }
 
+export type Answer = {
+  from: string,
+  answer: string
+}
+

@@ -1,5 +1,5 @@
-import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetPlaylistMinimumQuery } from "../../store/api/playlistsApiSlice";
 
 interface Props {
     uri: string;
