@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { getSpotifyToken } from "../api/spotify";
-import usePlaylist from "../hooks/usePlaylist";
-import BlackBackground from "./BlackBackground";
-import Player from "./Player";
 import { useEffect, useState } from "react";
-import useTrackSelection from "../hooks/useTrackSelection";
-import SexyButton from "./SexyButton";
-import useWebsocketSetup from "./useWebsocketSetup";
+import { getSpotifyToken } from "../../api/spotify";
+import usePlaylist from "../../hooks/usePlaylist";
+import useTrackSelection from "../../hooks/useTrackSelection";
+import useWebsocketSetup from "../../hooks/useWebsocketSetup";
+import BlackBackground from "../common/BlackBackground";
+import SexyButton from "../common/SexyButton";
+import Player from "../home/Player";
 
 export default function TrackDuel() {
     const randomTracks = useTrackSelection();

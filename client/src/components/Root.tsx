@@ -1,15 +1,15 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { isLoggedIn } from "../api/auth";
-import BlackBackground from "./BlackBackground";
-import SexyButton from "./SexyButton";
 import { User } from "../types";
 import { handleSpotifyRedirect, setSpotifyToken } from "../api/spotify";
-import Play from "./Play";
 import { authenticateSpotify } from "../store/state/userState";
 import useUser from "../hooks/useUser";
-import useAuthCheck from "./AuthCheck";
 import useAppDispatch from "../hooks/useAppDispatch";
+import useAuthCheck from "./auth/AuthCheck";
+import BlackBackground from "./common/BlackBackground";
+import SexyButton from "./common/SexyButton";
+import Play from "./home/Play";
 
 export default function Root() {
     useAuthCheck();

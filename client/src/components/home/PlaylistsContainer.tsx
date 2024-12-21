@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
-import { skipToken } from "@reduxjs/toolkit/query";
 import Playlist from "./Playlist";
 
 interface Props {

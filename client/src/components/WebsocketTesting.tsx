@@ -1,6 +1,6 @@
 import { useState } from "react";
-import BlackBackground from "./BlackBackground";
-import useWebsocketSetup from "./useWebsocketSetup";
+import useWebsocketSetup from "../hooks/useWebsocketSetup";
+import BlackBackground from "./common/BlackBackground";
 
 export default function WebsocketTesting() {
     const { sendAnswer, loading, answers } = useWebsocketSetup();
