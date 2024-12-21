@@ -10,7 +10,6 @@ import UnAuthGuard from "./components/UnAuthGuard.tsx";
 import Play from "./components/Play.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
-import Playlist from "./components/Playlist.tsx";
 import TrackDuel from "./components/TrackDuel.tsx";
 import WebsocketTesting from "./components/WebsocketTesting.tsx";
 
