@@ -12,6 +12,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import Playlist from "./components/Playlist.tsx";
 import TrackDuel from "./components/TrackDuel.tsx";
+import WebsocketTesting from "./components/WebsocketTesting.tsx";
 
 const router = createBrowserRouter([
     {
@@ -42,6 +43,11 @@ const router = createBrowserRouter([
     {
         path: "/duel",
         element: <TrackDuel />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/testing",
+        element: <WebsocketTesting />,
         errorElement: <ErrorPage />,
     },
 ]);

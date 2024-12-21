@@ -12,7 +12,7 @@ import { getSpotifyToken } from "../api/spotify";
 import { useGetPlaylistEssentialsQuery } from "../store/api/playlistsApiSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { updatePlaylist } from "../store/state/playlistState";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getRandomSongSelection } from "../utils";
 import { updateTracks } from "../store/state/trackSelectionState";
 import { getSavedPlaylists, savePlaylist } from "../api/playlist";
@@ -154,13 +154,9 @@ export default function Play() {
             {getSavedPlaylistsError && (
                 <p className="text-xl text-red-700">{getSavedPlaylistsError}</p>
             )}
-            <p className=" text-blue-700 text-xl">Offset: {offset}</p>
-            <p className=" text-blue-400 text-xl">
-                SavedPlaylists Length: {savedPlaylists.length}
-            </p>
-            <p className=" text-blue-200 text-xl">
-                Reload Signal: {reloadPlaylistsSignal}
-            </p>
+            <Link to="/testing" className="text-xl text-blue-500">
+                To /testing
+            </Link>
             {savedPlaylists.length > 0 && (
                 <>
                     <PlaylistsContainer
