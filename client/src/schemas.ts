@@ -24,4 +24,8 @@ export const socketResponseSchema = z.object({
   type: z.string()
 }).passthrough()
 
+export const generateRoomCodeSchema = z.object({
+  roomCode: z.string()
+})
+
 

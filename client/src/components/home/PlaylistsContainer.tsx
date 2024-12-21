@@ -23,6 +23,7 @@ export default function PlaylistsContainer({ uris, className, setPlaylistUri }: 
                         index={index}
                         selectedIndex={selectedIndex}
                         setSelectedIndex={setSelectedIndex}
+                        key={index}
                     />
                 ))}
             </div>

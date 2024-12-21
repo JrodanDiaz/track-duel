@@ -51,8 +51,6 @@ export const getSavedPlaylistsHandler = async (req: Request, res: Response) => {
         return;
     }
 
-    console.log(`Offset Query Param = ${offset}`);
-    
     if (!authSuccess || userId === null) {
         return;
     }
@@ -70,9 +68,8 @@ export const getSavedPlaylistsHandler = async (req: Request, res: Response) => {
         respondWithError(res, 400, "User Has No More Saved Playlists");
         return;
     }
-    console.log(`User ${userId}'s Playlists: ${JSON.stringify(savedPlaylists)}`);
     const playlistResponse = savedPlaylists.map((playlist) => playlist.playlist_url);
-    console.log(`Playlist Response: ${JSON.stringify(playlistResponse)}`);
+    console.log(`User ${userId} Playlists: ${JSON.stringify(playlistResponse)}`);
     res.status(200).json(playlistResponse);
 };
 

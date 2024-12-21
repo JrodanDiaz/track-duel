@@ -46,8 +46,6 @@ export default function Play() {
     const [offset, setOffset] = useState(savedPlaylists.length);
     const [reloadPlaylistsSignal, updateReloadPlaylistsSignal] = useState(1);
 
-    console.log(`savedPlaylists = ${savedPlaylists}, offset = ${offset}`);
-
     const {
         data: playlistData,
         isLoading,

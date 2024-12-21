@@ -10,8 +10,8 @@ import WebsocketTesting from "./components/WebsocketTesting.tsx";
 import LoginPage from "./components/auth/LoginPage.tsx";
 import UnAuthGuard from "./components/auth/UnAuthGuard.tsx";
 import ErrorPage from "./components/common/ErrorPage.tsx";
-import TrackDuel from "./components/duel/TrackDuel.tsx";
 import Play from "./components/home/Play.tsx";
+import Duel from "./components/duel/Duel.tsx";
 
 const router = createBrowserRouter([
     {
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/duel",
-        element: <TrackDuel />,
+        element: <Duel />,
         errorElement: <ErrorPage />,
     },
     {

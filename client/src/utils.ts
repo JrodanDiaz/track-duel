@@ -16,11 +16,3 @@ export const getRandomSongSelection = (
     console.log(selection);
     return selection;
   };
-
-export const generateRoomCode = (length = 6) => {
-  let code = ""
-  for(let i = 0; i < length; i++) {
-    code +=  String.fromCharCode(65 + (Math.floor(Math.random() * 26)))
-  }
-  return code
-}

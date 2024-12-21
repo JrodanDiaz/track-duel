@@ -36,9 +36,12 @@ export default function useWebsocketSetup() {
                 ]);
                 break;
             case SocketResponse.RoomJoined:
-                console.log(
-                    `Successfully connected to room ${parsedMessage.data.roomCode}`
-                );
+                console.log(`Successfully connected to room`);
+                console.log(`Lobby: ${parsedMessage.data.users}`);
+
+                break;
+            case SocketResponse.UserJoined:
+                console.log(`${parsedMessage.data.user} joined the room!`);
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -51,7 +54,10 @@ export default function useWebsocketSetup() {
 
     useEffect(() => {
         console.log("Running Websocket Setup..");
-        const url = "ws://localhost:3000";
+        if (!user.username) {
+            throw new Error("Username undefined while establishing connection...");
+        }
+        const url = `ws://localhost:3000?user=${user.username}`;
         socketRef.current = new WebSocket(url);
 
         socketRef.current.onopen = () => {
@@ -88,3 +94,5 @@ export default function useWebsocketSetup() {
         },
     };
 }
+
+export type useWebsocketReturnType = ReturnType<typeof useWebsocketSetup>;

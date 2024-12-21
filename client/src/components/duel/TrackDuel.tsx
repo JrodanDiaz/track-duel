@@ -3,13 +3,17 @@ import { useEffect, useState } from "react";
 import { getSpotifyToken } from "../../api/spotify";
 import usePlaylist from "../../hooks/usePlaylist";
 import useTrackSelection from "../../hooks/useTrackSelection";
-import useWebsocketSetup from "../../hooks/useWebsocketSetup";
+import useWebsocketSetup, { useWebsocketReturnType } from "../../hooks/useWebsocketSetup";
 import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
 import Player from "../home/Player";
 import Input from "../common/Input";
 
-export default function TrackDuel() {
+interface Props {
+    socket: useWebsocketReturnType;
+}
+
+export default function TrackDuel({ socket }: Props) {
     const randomTracks = useTrackSelection();
     const playlist = usePlaylist();
     const navigate = useNavigate();
