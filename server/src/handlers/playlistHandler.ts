@@ -69,7 +69,6 @@ export const getSavedPlaylistsHandler = async (req: Request, res: Response) => {
         return;
     }
     const playlistResponse = savedPlaylists.map((playlist) => playlist.playlist_url);
-    console.log(`User ${userId} Playlists: ${JSON.stringify(playlistResponse)}`);
     res.status(200).json(playlistResponse);
 };
 

@@ -26,7 +26,6 @@ export const configureWebsocketServer = (server: Server) => {
             console.log(`User Undefined. Closing connection`);
             return 
         }
-        console.log(`ws user: ${user}`);
         userSocketMap.set(ws, user)
 
         ws.on("error", onSocketPostError);
@@ -41,9 +40,13 @@ export const configureWebsocketServer = (server: Server) => {
                 if (rooms[roomCode]) {
                   rooms[roomCode].users.add(ws);  
                   console.log(`User ${user} joined room ${roomCode}`);
+
                   const lobby = Array.from(rooms[roomCode].users).map(socket => userSocketMap.get(socket));
+
                   console.log(`${roomCode} Lobby: ${lobby}`);
+
                   ws.send(JSON.stringify({ type: 'room-joined', users: lobby }));
+
                   rooms[roomCode].users.forEach(socket => {
                     socket.send(JSON.stringify({type: "user-joined", user: user}))
                   })
@@ -68,19 +71,22 @@ export const configureWebsocketServer = (server: Server) => {
         ws.on("close", () => {
             console.log("Connection closed");
 
-            if(userSocketMap.has(ws)) {
-                console.log(`userSocketMap Size Before: ${userSocketMap.size}`);
-                userSocketMap.delete(ws)
-                console.log(`userSocketMap Size After: ${userSocketMap.size}`);
-            }
             
             if(roomCode && rooms[roomCode]) {
-                console.log(`roomCode of disconnected user: ${roomCode}`);
                 console.log(`Room Before: ${rooms[roomCode].users.size}`);
+
                 rooms[roomCode].users.delete(ws)
+
                 console.log(`Room After: ${rooms[roomCode].users.size}`);
                 if(rooms[roomCode].users.size === 0) {
+                    console.log(`Deleting room ${roomCode}`);
                     delete rooms[roomCode]
+                }
+                else {
+                    const room = Array.from(rooms[roomCode].users).map(socket => userSocketMap.get(socket));
+                    rooms[roomCode].users.forEach(socket => {
+                        socket.send(JSON.stringify({type: "room-update", room: room}))
+                    })
                 }
             }
             if(user && userRoomMap[user]) {
@@ -89,6 +95,13 @@ export const configureWebsocketServer = (server: Server) => {
                 console.log(`userRoomMap after DC: ${JSON.stringify(userRoomMap)}`);
                 
             }
+
+            // if(userSocketMap.has(ws)) {
+            console.log(`userSocketMap Size Before: ${userSocketMap.size}`);
+            userSocketMap.delete(ws)
+            console.log(`userSocketMap Size After: ${userSocketMap.size}`);
+            // }
+
             if(user) {
                 console.log(`${user} disconnected...`);
             }

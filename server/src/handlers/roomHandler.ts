@@ -32,7 +32,6 @@ export const generateRoomHandler = async (req: Request, res: Response) => {
     return
   }
   user = user as string
-  console.log(`${user} generating new room code..`);
   
 
   //if this user already has a generated room, delete it before adding new one
@@ -44,9 +43,7 @@ export const generateRoomHandler = async (req: Request, res: Response) => {
     const roomCode = generateRoomCode();
     rooms[roomCode] = { users: new Set() };
     userRoomMap[user] = roomCode
-    console.log(`UserRoomMap: ${JSON.stringify(userRoomMap)}`);
     console.log(`Rooms: ${JSON.stringify(rooms)}`);
-    
     
     res.status(200).json({ roomCode: roomCode });
 }

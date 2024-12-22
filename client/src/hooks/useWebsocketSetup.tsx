@@ -52,6 +52,11 @@ export default function useWebsocketSetup() {
                 console.log(`Start Duel: ${parsedMessage.data.type}`);
                 setStartSignal(true);
                 break;
+            case SocketResponse.RoomUpdate:
+                console.log(`Room Update`);
+                //more evil type casting
+                setLobby(parsedMessage.data.room as string[]);
+                break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
                 break;

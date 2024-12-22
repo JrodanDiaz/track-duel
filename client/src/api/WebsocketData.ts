@@ -4,5 +4,6 @@ export const SocketResponse = {
     Error: "error",
     RoomJoined: "room-joined",
     UserJoined: "user-joined",
-    StartDuel: "start-duel"
+    StartDuel: "start-duel",
+    RoomUpdate: "room-update"
 }

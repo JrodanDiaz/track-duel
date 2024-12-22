@@ -4,7 +4,7 @@ import BlackBackground from "./common/BlackBackground";
 import Input from "./common/Input";
 
 export default function WebsocketTesting() {
-    const { sendAnswer, loading, answers, joinRoom } = useWebsocketSetup();
+    const { sendAnswer, loading, answers, joinRoom, lobby } = useWebsocketSetup();
     const [answer, setAnswer] = useState("");
     const [roomCode, setRoomCode] = useState("");
     return (
@@ -35,6 +35,12 @@ export default function WebsocketTesting() {
                 >
                     Join Room
                 </button>
+                {lobby.length > 0 &&
+                    lobby.map((player, i) => (
+                        <p className="text-xl text-offwhite" key={`${i}-${player}`}>
+                            {player}
+                        </p>
+                    ))}
 
                 {answers.length > 0 &&
                     answers.map((ans) => (
