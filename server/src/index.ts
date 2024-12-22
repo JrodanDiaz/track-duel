@@ -1,54 +1,65 @@
-import express from "express";
-import cookieParser from 'cookie-parser'
-import cors from "cors"
+import express, { Request, Response } from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import { registerHandler } from "./handlers/register";
 import { clearUsersHandler, getUsersHandler } from "./handlers/userHandler";
 import { loginHandler } from "./handlers/login";
 import { spotifyLoginHandler, spotifyCallbackHandler } from "./handlers/spotifyHandler";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 import { implicitLoginHandler } from "./handlers/implicit_login";
 import { getTokenHandler } from "./auth/utils";
-import { createPlaylistHandler, getSavedPlaylistsHandler, revealPlaylistsHandler } from "./handlers/playlistHandler";
+import {
+    createPlaylistHandler,
+    getSavedPlaylistsHandler,
+    revealPlaylistsHandler,
+} from "./handlers/playlistHandler";
+import { createServer} from "http";
+import { configureWebsocketServer } from "./websockets";
+import { generateRoomHandler } from "./handlers/roomHandler";
 
-dotenv.config()
+dotenv.config();
 const app = express();
+export const server = createServer(app);
 const port = 3000;
 
-var corsOptions = {
-  origin: 'http://localhost:5173',
-  credentials: true,
-}
+configureWebsocketServer(server)
 
-app.use(cors(corsOptions))
-app.use(express.json())
-app.use(cookieParser())
+var corsOptions = {
+    origin: "http://localhost:5173",
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  console.log("GET request from home route received");
-  res.send("Express + TypeScript Server hello");
+    console.log("GET request from home route received");
+    // res.send("Express + TypeScript Server hello");
+    res.end();
 });
 
-app.get("/auth/getToken", getTokenHandler)
+app.get("/auth/getToken", getTokenHandler);
 
-app.get("/users", getUsersHandler)
-app.post("/users", clearUsersHandler)
+app.get("/users", getUsersHandler);
+app.post("/users", clearUsersHandler);
 
-app.post("/register", registerHandler)
-app.post("/login", loginHandler)
-app.get("/implicit_login", implicitLoginHandler)
+app.post("/register", registerHandler);
+app.post("/login", loginHandler);
+app.get("/implicit_login", implicitLoginHandler);
 
-app.get("/spotify", spotifyLoginHandler)
-app.get('/auth/callback', spotifyCallbackHandler )
+app.get("/spotify", spotifyLoginHandler);
+app.get("/auth/callback", spotifyCallbackHandler);
 
-app.get("/playlist", getSavedPlaylistsHandler)
-app.post("/playlist", createPlaylistHandler)
-app.get("/playlists/reveal", revealPlaylistsHandler)
+app.get("/playlist", getSavedPlaylistsHandler);
+app.post("/playlist", createPlaylistHandler);
+app.get("/playlists/reveal", revealPlaylistsHandler);
 
-
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-  // console.log(`Testing ENV: ${process.env.SPOTIFY_CLIENT_ID}`);
+app.get('/generate-room', generateRoomHandler);
   
+
+server.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
 /* 

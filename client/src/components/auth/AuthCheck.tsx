@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { getUserFromToken } from "../api/auth";
-import { updateUser } from "../store/state/userState";
-import { getSpotifyToken } from "../api/spotify";
-import useAppDispatch from "../hooks/useAppDispatch";
-import useUser from "../hooks/useUser";
+import { getUserFromToken } from "../../api/auth";
+import { getSpotifyToken } from "../../api/spotify";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useUser from "../../hooks/useUser";
+import { updateUser } from "../../store/state/userState";
 
 export default function useAuthCheck() {
   const userStore = useUser();

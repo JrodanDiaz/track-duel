@@ -1,5 +1,5 @@
-import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetPlaylistMinimumQuery } from "../../store/api/playlistsApiSlice";
 
 interface Props {
     uri: string;
@@ -29,7 +29,7 @@ export default function Playlist({
                 selectedIndex === index && "border-2 border-lilac"
             } ${classname}`}
             onClick={() => {
-                setSelectedIndex(index);
+                setSelectedIndex(index === selectedIndex ? null : index);
             }}
         >
             {data.images[0].url && (

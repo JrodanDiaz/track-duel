@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { useGetPlaylistMinimumQuery } from "../store/api/playlistsApiSlice";
-import { skipToken } from "@reduxjs/toolkit/query";
 import Playlist from "./Playlist";
 
 interface Props {
@@ -13,9 +11,7 @@ export default function PlaylistsContainer({ uris, className, setPlaylistUri }: 
     const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
     useEffect(() => {
-        if (selectedIndex !== null) {
-            setPlaylistUri(uris[selectedIndex]);
-        }
+        setPlaylistUri(selectedIndex === null ? undefined : uris[selectedIndex]);
     }, [selectedIndex]);
 
     return (
@@ -27,6 +23,7 @@ export default function PlaylistsContainer({ uris, className, setPlaylistUri }: 
                         index={index}
                         selectedIndex={selectedIndex}
                         setSelectedIndex={setSelectedIndex}
+                        key={index}
                     />
                 ))}
             </div>

@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
-import useUser from "../hooks/useUser";
-import useAppDispatch from "../hooks/useAppDispatch";
 import Player from "./Player";
 import PlaylistsContainer from "./PlaylistsContainer";
 import TrackSearchResult from "./TrackSearchResult";
-import { Track } from "../types";
-import { test_uris } from "../playlists";
-import { isLoggedIn } from "../api/auth";
-import { getSpotifyToken } from "../api/spotify";
-import { useGetPlaylistEssentialsQuery } from "../store/api/playlistsApiSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { updatePlaylist } from "../store/state/playlistState";
-import { useNavigate } from "react-router-dom";
-import { getRandomSongSelection } from "../utils";
-import { updateTracks } from "../store/state/trackSelectionState";
-import { getSavedPlaylists, savePlaylist } from "../api/playlist";
+import { Link, useNavigate } from "react-router-dom";
+import { isLoggedIn } from "../../api/auth";
+import { savePlaylist, getSavedPlaylists } from "../../api/playlist";
+import { getSpotifyToken } from "../../api/spotify";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useUser from "../../hooks/useUser";
+import { test_uris } from "../../playlists";
+import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice";
+import { updatePlaylist } from "../../store/state/playlistState";
+import { updateTracks } from "../../store/state/trackSelectionState";
+import { Track } from "../../types";
+import { generateRoomCode, getRandomSongSelection } from "../../utils";
 
 /*
  on mount, get first x playlists from this user id.
@@ -45,8 +45,6 @@ export default function Play() {
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);
     const [reloadPlaylistsSignal, updateReloadPlaylistsSignal] = useState(1);
-
-    console.log(`savedPlaylists = ${savedPlaylists}, offset = ${offset}`);
 
     const {
         data: playlistData,
@@ -154,13 +152,9 @@ export default function Play() {
             {getSavedPlaylistsError && (
                 <p className="text-xl text-red-700">{getSavedPlaylistsError}</p>
             )}
-            <p className=" text-blue-700 text-xl">Offset: {offset}</p>
-            <p className=" text-blue-400 text-xl">
-                SavedPlaylists Length: {savedPlaylists.length}
-            </p>
-            <p className=" text-blue-200 text-xl">
-                Reload Signal: {reloadPlaylistsSignal}
-            </p>
+            <Link to="/testing" className="text-xl text-blue-500">
+                To /testing
+            </Link>
             {savedPlaylists.length > 0 && (
                 <>
                     <PlaylistsContainer
@@ -195,14 +189,11 @@ export default function Play() {
             {savePlaylistSuccess === false && (
                 <p className="text-xl text-red-700">Error While Saving Playlist</p>
             )}
-            <form
-                onSubmit={handlePlaylistSubmit}
-                className="border-2 border-gray-600 rounded-lg p-5"
-            >
+            <form onSubmit={handlePlaylistSubmit} className="p-5">
                 <input
                     type="text"
                     placeholder="Enter Playlist URL"
-                    className=" focus:outline-none px-5 py-3"
+                    className=" focus:outline-none px-5 py-3 bg-transparent border-2 border-lilac text-offwhite"
                     value={playlistUrl}
                     onChange={(e) => setPlaylistUrl(e.target.value)}
                 />

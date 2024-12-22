@@ -20,3 +20,12 @@ export const implicitLoginSchema = z.object({
 
 export const getSavedPlaylistsSchema = z.array(z.string()).or(serverErrorSchema)
 
+export const socketResponseSchema = z.object({
+  type: z.string()
+}).passthrough()
+
+export const generateRoomCodeSchema = z.object({
+  roomCode: z.string()
+})
+
+

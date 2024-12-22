@@ -2,16 +2,16 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./components/Root.tsx";
-import RegisterPage from "./components/RegisterPage.tsx";
-import ErrorPage from "./components/ErrorPage.tsx";
+import RegisterPage from "./components/auth/RegisterPage.tsx";
 import "./index.css";
-import LoginPage from "./components/LoginPage.tsx";
-import UnAuthGuard from "./components/UnAuthGuard.tsx";
-import Play from "./components/Play.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
-import Playlist from "./components/Playlist.tsx";
-import TrackDuel from "./components/TrackDuel.tsx";
+import WebsocketTesting from "./components/WebsocketTesting.tsx";
+import LoginPage from "./components/auth/LoginPage.tsx";
+import UnAuthGuard from "./components/auth/UnAuthGuard.tsx";
+import ErrorPage from "./components/common/ErrorPage.tsx";
+import Play from "./components/home/Play.tsx";
+import Duel from "./components/duel/Duel.tsx";
 
 const router = createBrowserRouter([
     {
@@ -41,7 +41,12 @@ const router = createBrowserRouter([
     },
     {
         path: "/duel",
-        element: <TrackDuel />,
+        element: <Duel />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/testing",
+        element: <WebsocketTesting />,
         errorElement: <ErrorPage />,
     },
 ]);
