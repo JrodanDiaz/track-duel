@@ -9,6 +9,7 @@ export default function useWebsocketSetup() {
     const socketRef = useRef<WebSocket | null>(null);
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
+    const [lobby, setLobby] = useState<string[]>([]);
     const dispatch = useAppDispatch();
     const user = useUser();
 
@@ -38,10 +39,13 @@ export default function useWebsocketSetup() {
             case SocketResponse.RoomJoined:
                 console.log(`Successfully connected to room`);
                 console.log(`Lobby: ${parsedMessage.data.users}`);
-
+                setLobby(parsedMessage.data.users as string[]);
                 break;
             case SocketResponse.UserJoined:
                 console.log(`${parsedMessage.data.user} joined the room!`);
+                setLobby((prev) => [
+                    ...new Set([...prev, parsedMessage.data.user as string]),
+                ]);
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -85,6 +89,7 @@ export default function useWebsocketSetup() {
             setAnswers([]);
         },
         joinRoom: (roomCode: string) => {
+            setLobby([]);
             socketRef.current?.send(
                 JSON.stringify({
                     type: "join-room",
@@ -92,6 +97,7 @@ export default function useWebsocketSetup() {
                 })
             );
         },
+        lobby,
     };
 }
 

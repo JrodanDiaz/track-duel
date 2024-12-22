@@ -42,6 +42,10 @@ export default function Lobby({ startGame, socket }: Props) {
                 >
                     Generate New Code
                 </button>
+                {socket.lobby.length > 0 &&
+                    socket.lobby.map((user) => (
+                        <p className="text-xl text-offwhite">{user}</p>
+                    ))}
                 <button
                     onClick={() => startGame()}
                     className="bg-transparent border-2 border-red-700 text-red-700 px-5 py-2"
