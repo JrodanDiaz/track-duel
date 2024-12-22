@@ -10,6 +10,7 @@ export default function useWebsocketSetup() {
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [lobby, setLobby] = useState<string[]>([]);
+    const [startSignal, setStartSignal] = useState(false);
     const dispatch = useAppDispatch();
     const user = useUser();
 
@@ -47,6 +48,10 @@ export default function useWebsocketSetup() {
                     ...new Set([...prev, parsedMessage.data.user as string]),
                 ]);
                 break;
+            case SocketResponse.StartDuel:
+                console.log(`Start Duel: ${parsedMessage.data.type}`);
+                setStartSignal(true);
+                break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
                 break;
@@ -61,6 +66,7 @@ export default function useWebsocketSetup() {
         if (!user.username) {
             throw new Error("Username undefined while establishing connection...");
         }
+
         const url = `ws://localhost:3000?user=${user.username}`;
         socketRef.current = new WebSocket(url);
 
@@ -70,6 +76,10 @@ export default function useWebsocketSetup() {
         };
 
         socketRef.current.addEventListener("message", handleMessage);
+
+        socketRef.current.onclose = () => {
+            console.log("Websocket connection closed..");
+        };
 
         return () => {
             console.log("Cleaning up Websocket connection..");
@@ -97,7 +107,19 @@ export default function useWebsocketSetup() {
                 })
             );
         },
+        startDuel: (roomCode: string) => {
+            if (!roomCode) {
+                throw new Error("Error: attempted to start duel with no room code");
+            }
+            socketRef.current?.send(
+                JSON.stringify({
+                    type: "start-duel",
+                    roomCode: roomCode,
+                })
+            );
+        },
         lobby,
+        startSignal,
     };
 }
 

@@ -51,6 +51,11 @@ export const configureWebsocketServer = (server: Server) => {
                   ws.send(JSON.stringify({ type: 'error', message: 'Room not found' }));
                 }
               }
+            else if(parsedMessage.type === "start-duel" && parsedMessage.roomCode) {
+                rooms[parsedMessage.roomCode].users.forEach(socket => {
+                    socket.send(JSON.stringify({type: "start-duel"}))
+                })
+            }
             else {
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {

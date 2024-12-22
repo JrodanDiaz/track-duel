@@ -1,18 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useWebsocketReturnType } from "../../hooks/useWebsocketSetup";
 import BlackBackground from "../common/BlackBackground";
 import { generateRoomCode } from "../../api/roomCode";
 import useUser from "../../hooks/useUser";
-interface Props {
-    startGame: () => void;
-    socket: useWebsocketReturnType;
-}
+import { WebsocketContext } from "./Duel";
 
-export default function Lobby({ startGame, socket }: Props) {
+export default function Lobby() {
     const user = useUser();
     const [regenerateSignal, sendRegenerateSignal] = useState(0);
     const [codeError, setCodeError] = useState(false);
     const [code, setCode] = useState("");
+    const socket = useContext(WebsocketContext);
 
     useEffect(() => {
         generateRoomCode(user.username).then((result) => {
@@ -47,10 +45,10 @@ export default function Lobby({ startGame, socket }: Props) {
                         <p className="text-xl text-offwhite">{user}</p>
                     ))}
                 <button
-                    onClick={() => startGame()}
+                    onClick={() => socket.startDuel(code)}
                     className="bg-transparent border-2 border-red-700 text-red-700 px-5 py-2"
                 >
-                    Start Game
+                    Start Duel
                 </button>
             </div>
         </BlackBackground>

@@ -1,19 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getSpotifyToken } from "../../api/spotify";
 import usePlaylist from "../../hooks/usePlaylist";
 import useTrackSelection from "../../hooks/useTrackSelection";
-import useWebsocketSetup, { useWebsocketReturnType } from "../../hooks/useWebsocketSetup";
 import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
 import Player from "../home/Player";
 import Input from "../common/Input";
+import { WebsocketContext } from "./Duel";
 
-interface Props {
-    socket: useWebsocketReturnType;
-}
-
-export default function TrackDuel({ socket }: Props) {
+export default function TrackDuel() {
     const randomTracks = useTrackSelection();
     const playlist = usePlaylist();
     const navigate = useNavigate();
@@ -25,7 +21,7 @@ export default function TrackDuel({ socket }: Props) {
     const [correct, setCorrect] = useState<boolean>(false);
     const [score, setScore] = useState<number>(0);
     const [roomCode, setRoomCode] = useState("");
-    const { sendAnswer, loading, answers, resetAnswers } = useWebsocketSetup();
+    const socket = useContext(WebsocketContext);
 
     if (!randomTracks) {
         console.error("Playlist is undefined");
@@ -57,14 +53,14 @@ export default function TrackDuel({ socket }: Props) {
             setElapsedTime(elapsedTime);
             setScore((prevScore) => prevScore + 100 - Math.round(elapsedTime / 1000));
         } else {
-            sendAnswer(answer);
+            socket.sendAnswer(answer);
         }
     };
 
     const selectNextSong = () => {
         if (currentTrackIndex >= randomTracks.length - 1) return;
         setAnswer("");
-        resetAnswers();
+        socket.resetAnswers();
         setCurrentTrackIndex((prev) => prev + 1);
         setCorrect(false);
         setPlay(true);
@@ -75,7 +71,9 @@ export default function TrackDuel({ socket }: Props) {
         <BlackBackground>
             <div className="flex flex-col items-center">
                 <h1 className="text-5xl font-bebas text-offwhite my-6">TRACK DUEL</h1>
-                {loading && <p className="text-offwhite">Establishing connection...</p>}
+                {socket.loading && (
+                    <p className="text-offwhite">Establishing connection...</p>
+                )}
                 <img src={playlist.images[0].url} height={150} width={150} />
                 <button
                     onClick={() => selectNextSong()}
@@ -97,7 +95,7 @@ export default function TrackDuel({ socket }: Props) {
                 />
 
                 <div className="border-2 border-gray-500 rounded-lg p-5 w-2/5">
-                    {answers.map((answer, i) => (
+                    {socket.answers.map((answer, i) => (
                         <p
                             className={`${
                                 i % 2 === 0 ? "text-offwhite" : "text-main-green"
