@@ -9,7 +9,11 @@ import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { useNavigate } from "react-router-dom";
 import { updatePlaylist } from "../../store/state/playlistState";
-import { getRandomSongSelection } from "../../utils";
+import {
+    getRandomPlaylistIndexes,
+    getRandomSongSelection,
+    getSongsFromIndexes,
+} from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
 import Playlist from "../home/Playlist";
 
@@ -43,7 +47,6 @@ export default function ActiveLobby() {
         if (!selectedPlaylistUri)
             throw new Error("Cannot Lock In On Undefined Playlist!");
         setConfirmedPlaylistUri(selectedPlaylistUri);
-        socket.broadcastPlaylistUri(selectedPlaylistUri);
     };
 
     useEffect(() => {
@@ -69,13 +72,26 @@ export default function ActiveLobby() {
     }, [offset, socket.isHost]);
 
     useEffect(() => {
-        if (isSuccess) {
+        if (isSuccess && socket.isHost) {
             dispatch(updatePlaylist(playlistData));
-            const randomSelection = getRandomSongSelection(playlistData);
-            dispatch(updateTracks(randomSelection));
-            // navigate("/duel");
+            // const randomSelection = getRandomSongSelection(playlistData);
+            const playlistIndexes = getRandomPlaylistIndexes(
+                playlistData.tracks.items.length
+            );
+
+            dispatch(updateTracks(getSongsFromIndexes(playlistIndexes, playlistData)));
+            socket.broadcastPlaylistUri(confirmedPlaylistUri!, playlistIndexes);
         }
-    }, [isSuccess, playlistData, dispatch, navigate]);
+    }, [isSuccess, playlistData]);
+
+    useEffect(() => {
+        if (!socket.isHost && isSuccess && socket.playlistIndexes) {
+            dispatch(updatePlaylist(playlistData));
+            dispatch(
+                updateTracks(getSongsFromIndexes(socket.playlistIndexes, playlistData))
+            );
+        }
+    }, [socket.isHost, isSuccess, socket.playlistIndexes]);
 
     //instead of this, we could just have socket.playlistUri be the working state variable.
     //Will probably be less responsive for the host though
@@ -130,12 +146,16 @@ export default function ActiveLobby() {
                     </>
                 )}
                 {!socket.isHost && confirmedPlaylistUri && (
-                    <Playlist uri={confirmedPlaylistUri} />
+                    <>
+                        <p className="text-6xl text-offwhite font-bebas">
+                            Playlist Locked In
+                        </p>
+                        <Playlist uri={confirmedPlaylistUri} imageSize={225} />
+                    </>
                 )}
                 {selectedPlaylistUri && !isSuccess && (
                     <>
                         <button
-                            // onClick={() => setConfirmedPlaylistUri(selectedPlaylistUri)}
                             onClick={() => handleLockInPlaylist()}
                             className=" px-3 py-5 border-2 border-main-green text-main-green font-bold hover:text-main-black hover:bg-main-green"
                         >
@@ -143,7 +163,12 @@ export default function ActiveLobby() {
                         </button>
                     </>
                 )}
-                {isSuccess && (
+                {socket.playlistIndexes.length > 0 && (
+                    <p className="text-2xl text-orangey">
+                        {JSON.stringify(socket.playlistIndexes)}
+                    </p>
+                )}
+                {isSuccess && socket.isHost && (
                     <Button
                         content="Start Duel"
                         className="text-2xl text-red-700 border-red-700"

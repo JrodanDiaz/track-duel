@@ -117,7 +117,8 @@ export const configureWebsocketServer = (server: Server) => {
                     sendMessage(ws, {type: SocketResponse.Error, message: "Internal Server Error: Room Code Undefined"})
                     return
                 }
-                sendMessageToRoom(roomCode, {type: SocketResponse.Playlist, playlist_uri: parsedMessage.playlist_uri})
+                //to optimize, we can probably just return parsedMessage, since we're not transforming or adding any new data. Just relaying
+                sendMessageToRoom(roomCode, {type: SocketResponse.Playlist, playlist_uri: parsedMessage.playlist_uri, playlist_indexes: parsedMessage.playlist_indexes})
             }
             else {
                 wss.clients.forEach((client) => {

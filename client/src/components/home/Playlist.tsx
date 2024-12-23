@@ -7,6 +7,7 @@ interface Props {
     selectedIndex?: number | null;
     setSelectedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
     classname?: string;
+    imageSize?: number;
 }
 
 export default function Playlist({
@@ -15,6 +16,7 @@ export default function Playlist({
     selectedIndex = -1,
     setSelectedIndex,
     classname = "",
+    imageSize = 150,
 }: Props) {
     const { data, isLoading, error } = useGetPlaylistMinimumQuery(uri ?? skipToken);
 
@@ -35,9 +37,9 @@ export default function Playlist({
             }}
         >
             {data.images[0].url && (
-                <img src={data.images[0].url} height={150} width={150} />
+                <img src={data.images[0].url} height={imageSize} width={imageSize} />
             )}
-            <p className=" text-offwhite">{data.name}</p>
+            <p className=" text-offwhite text-md">{data.name}</p>
         </div>
     );
 }

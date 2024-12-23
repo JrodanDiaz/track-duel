@@ -34,6 +34,7 @@ export default function useWebsocketSetup() {
     const [startSignal, setStartSignal] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [playlistUri, setPlaylistUri] = useState("");
+    const [playlistIndexes, setPlaylistIndexes] = useState<number[]>([]);
     const dispatch = useAppDispatch();
 
     const handleMessage = (message: MessageEvent) => {
@@ -91,8 +92,8 @@ export default function useWebsocketSetup() {
                 setAnswers([]);
                 break;
             case SocketResponse.Playlist:
-                console.log(`Received Playlist URI: ${parsedMessage.data.playlist_uri}`);
                 setPlaylistUri(parsedMessage.data.playlist_uri as string);
+                setPlaylistIndexes(parsedMessage.data.playlist_indexes as number[]);
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -169,9 +170,13 @@ export default function useWebsocketSetup() {
                 JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
             );
         },
-        broadcastPlaylistUri: (uri: string) => {
+        broadcastPlaylistUri: (uri: string, playlistIndexes: number[]) => {
             socketRef.current?.send(
-                JSON.stringify({ type: SocketRequest.SendPlaylist, playlist_uri: uri })
+                JSON.stringify({
+                    type: SocketRequest.SendPlaylist,
+                    playlist_uri: uri,
+                    playlist_indexes: playlistIndexes,
+                })
             );
         },
         lobby,
@@ -179,6 +184,7 @@ export default function useWebsocketSetup() {
         roomCode,
         isHost,
         playlistUri,
+        playlistIndexes,
     };
 }
 

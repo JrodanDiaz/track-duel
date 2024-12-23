@@ -1,6 +1,19 @@
 import { PlaylistResponse } from "./api/spotifyTypes";
 import { Track } from "./api/spotifyTypes";
 
+export const getRandomPlaylistIndexes = (playlistLength: number, amount = 3) => {
+  const indexes = new Set<number>()
+  while(indexes.size < amount) {
+    indexes.add(Math.floor(Math.random() * playlistLength))
+  }
+  return [...indexes]
+}
+
+export const getSongsFromIndexes = (playlistIndexes: number[], playlist: PlaylistResponse) => {
+  const tracks: Track[] = playlistIndexes.map(index => playlist.tracks.items[index].track)
+  return tracks
+}
+
 export const getRandomSongSelection = (
     immutablePlaylist: PlaylistResponse,
     amount = 3
