@@ -5,7 +5,9 @@ import { rooms, userRoomMap } from "./handlers/roomHandler";
 enum SocketRequest {
     JoinRoom = "join-room",
     LeaveRoom = "leave-room",
-    StartDuel = "start-duel"
+    StartDuel = "start-duel",
+    SendPlaylist = "send-playlist",
+    Answer = "answer"
 }
 
 enum SocketResponse {
@@ -13,7 +15,8 @@ enum SocketResponse {
     RoomJoined = "room-joined",
     Error = "error",
     StartDuel = "start-duel",
-    LeftRoom = "left-room"
+    LeftRoom = "left-room",
+    Playlist = "playlist"
 }
 
 const userSocketMap = new Map<WebSocket, string>();
@@ -109,6 +112,13 @@ export const configureWebsocketServer = (server: Server) => {
                 removeUserFromRoom(roomCode, ws)
                 sendMessage(ws, {type: SocketResponse.LeftRoom})
             } 
+            else if(parsedMessage.type === SocketRequest.SendPlaylist) {
+                if(!roomCode) {
+                    sendMessage(ws, {type: SocketResponse.Error, message: "Internal Server Error: Room Code Undefined"})
+                    return
+                }
+                sendMessageToRoom(roomCode, {type: SocketResponse.Playlist, playlist_uri: parsedMessage.playlist_uri})
+            }
             else {
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
@@ -125,24 +135,6 @@ export const configureWebsocketServer = (server: Server) => {
                 removeUserFromRoom(roomCode, ws)
             }
             userSocketMap.delete(ws);
-            // if (roomCode && rooms[roomCode]) {
-
-            //     rooms[roomCode].users.delete(ws);
-            //     console.log(`Removed ${user} from room ${roomCode}`);
-
-            //     if (rooms[roomCode].users.size === 0) {
-            //         delete rooms[roomCode];
-            //         console.log(`Deleted empty room ${roomCode}`);
-            //     } else {
-            //         const room = getUsersFromRoom(roomCode);
-            //         sendMessageToRoom(roomCode, { type: "room-update", room: room });
-            //     }
-            // }
-            // if (userRoomMap[user]) {
-            //     delete userRoomMap[user];
-            //     console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
-            // }
-
             console.log(`${user} disconnected...`);
         });
     });

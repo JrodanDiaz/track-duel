@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { updatePlaylist } from "../../store/state/playlistState";
 import { getRandomSongSelection } from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
+import Playlist from "../home/Playlist";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
@@ -36,6 +37,13 @@ export default function ActiveLobby() {
 
     const incrementOffset = () => {
         setOffset(savedPlaylists.length);
+    };
+
+    const handleLockInPlaylist = () => {
+        if (!selectedPlaylistUri)
+            throw new Error("Cannot Lock In On Undefined Playlist!");
+        setConfirmedPlaylistUri(selectedPlaylistUri);
+        socket.broadcastPlaylistUri(selectedPlaylistUri);
     };
 
     useEffect(() => {
@@ -68,6 +76,12 @@ export default function ActiveLobby() {
             // navigate("/duel");
         }
     }, [isSuccess, playlistData, dispatch, navigate]);
+
+    //instead of this, we could just have socket.playlistUri be the working state variable.
+    //Will probably be less responsive for the host though
+    useEffect(() => {
+        setConfirmedPlaylistUri(socket.playlistUri);
+    }, [socket.playlistUri]);
 
     return (
         <>
@@ -115,10 +129,14 @@ export default function ActiveLobby() {
                         />
                     </>
                 )}
+                {!socket.isHost && confirmedPlaylistUri && (
+                    <Playlist uri={confirmedPlaylistUri} />
+                )}
                 {selectedPlaylistUri && !isSuccess && (
                     <>
                         <button
-                            onClick={() => setConfirmedPlaylistUri(selectedPlaylistUri)}
+                            // onClick={() => setConfirmedPlaylistUri(selectedPlaylistUri)}
+                            onClick={() => handleLockInPlaylist()}
                             className=" px-3 py-5 border-2 border-main-green text-main-green font-bold hover:text-main-black hover:bg-main-green"
                         >
                             {isLoading ? "Loading" : "Lock In Playlist"}

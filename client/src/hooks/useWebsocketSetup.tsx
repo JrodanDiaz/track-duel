@@ -5,14 +5,23 @@ import { socketResponseSchema } from "../schemas";
 import { Answer } from "../types";
 
 enum SocketResponse {
-    Ping = "Ping",
-    Answer = "Answer",
+    Ping = "ping",
+    Answer = "answer",
     Error = "error",
     RoomJoined = "room-joined",
     UserJoined = "user-joined",
     StartDuel = "start-duel",
     RoomUpdate = "room-update",
     LeftRoom = "left-room",
+    Playlist = "playlist",
+}
+
+enum SocketRequest {
+    JoinRoom = "join-room",
+    LeaveRoom = "leave-room",
+    StartDuel = "start-duel",
+    SendPlaylist = "send-playlist",
+    Answer = "answer",
 }
 
 export default function useWebsocketSetup() {
@@ -24,6 +33,7 @@ export default function useWebsocketSetup() {
     const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
     const [isHost, setIsHost] = useState(false);
+    const [playlistUri, setPlaylistUri] = useState("");
     const dispatch = useAppDispatch();
 
     const handleMessage = (message: MessageEvent) => {
@@ -79,7 +89,10 @@ export default function useWebsocketSetup() {
                 setLobby([]);
                 setStartSignal(false);
                 setAnswers([]);
-
+                break;
+            case SocketResponse.Playlist:
+                console.log(`Received Playlist URI: ${parsedMessage.data.playlist_uri}`);
+                setPlaylistUri(parsedMessage.data.playlist_uri as string);
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -120,7 +133,11 @@ export default function useWebsocketSetup() {
         loading,
         sendAnswer: (answer: string) => {
             socketRef.current?.send(
-                JSON.stringify({ type: "Answer", from: user.username, answer: answer })
+                JSON.stringify({
+                    type: SocketRequest.Answer,
+                    from: user.username,
+                    answer: answer,
+                })
             );
         },
         answers,
@@ -131,7 +148,7 @@ export default function useWebsocketSetup() {
             setLobby([]);
             socketRef.current?.send(
                 JSON.stringify({
-                    type: "join-room",
+                    type: SocketRequest.JoinRoom,
                     roomCode: roomCode,
                 })
             );
@@ -142,20 +159,26 @@ export default function useWebsocketSetup() {
             }
             socketRef.current?.send(
                 JSON.stringify({
-                    type: "start-duel",
+                    type: SocketRequest.StartDuel,
                     roomCode: roomCode,
                 })
             );
         },
         leaveRoom: () => {
             socketRef.current?.send(
-                JSON.stringify({ type: "leave-room", roomCode: roomCode })
+                JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
+            );
+        },
+        broadcastPlaylistUri: (uri: string) => {
+            socketRef.current?.send(
+                JSON.stringify({ type: SocketRequest.SendPlaylist, playlist_uri: uri })
             );
         },
         lobby,
         startSignal,
         roomCode,
         isHost,
+        playlistUri,
     };
 }
 

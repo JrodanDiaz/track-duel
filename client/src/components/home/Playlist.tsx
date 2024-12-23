@@ -3,16 +3,16 @@ import { useGetPlaylistMinimumQuery } from "../../store/api/playlistsApiSlice";
 
 interface Props {
     uri: string;
-    index: number;
-    selectedIndex: number | null;
-    setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+    index?: number;
+    selectedIndex?: number | null;
+    setSelectedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
     classname?: string;
 }
 
 export default function Playlist({
     uri,
-    index,
-    selectedIndex,
+    index = 0,
+    selectedIndex = -1,
     setSelectedIndex,
     classname = "",
 }: Props) {
@@ -29,7 +29,9 @@ export default function Playlist({
                 selectedIndex === index && "border-2 border-lilac"
             } ${classname}`}
             onClick={() => {
-                setSelectedIndex(index === selectedIndex ? null : index);
+                if (setSelectedIndex && index !== undefined) {
+                    setSelectedIndex(index === selectedIndex ? null : index);
+                }
             }}
         >
             {data.images[0].url && (
