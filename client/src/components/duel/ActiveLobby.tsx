@@ -1,0 +1,40 @@
+import { useContext } from "react";
+import { WebsocketContext } from "./Duel";
+import Button from "../common/Button";
+
+export default function ActiveLobby() {
+    const socket = useContext(WebsocketContext);
+
+    const handleLeaveRoom = () => {
+        socket.leaveRoom();
+    };
+    //wrapped in a flex col div
+    return (
+        <>
+            <div className="flex flex-col items-center justify-center">
+                <h1 className="text-6xl font-bebas text-offwhite my-4">Lobby</h1>
+                <h1 className="text-2xl text-offwhite">
+                    Room Code:{" "}
+                    <span className="text-main-green text-2xl">{socket.roomCode}</span>
+                </h1>
+                <div className="flex flex-col gap-2 p-4 border-2 border-gray-500 rounded-sm w-1/4">
+                    {socket.lobby.map((player, i) => (
+                        <li
+                            className={`${
+                                i % 2 === 0 ? "text-surface75" : "text-offwhite"
+                            } text-xl list-none`}
+                            key={`${player}-${i}`}
+                        >
+                            {player}
+                        </li>
+                    ))}
+                </div>
+                <Button
+                    content="Leave Room"
+                    className="text-2xl"
+                    onClick={handleLeaveRoom}
+                />
+            </div>
+        </>
+    );
+}
