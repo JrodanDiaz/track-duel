@@ -15,7 +15,7 @@ import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice
 import { updatePlaylist } from "../../store/state/playlistState";
 import { updateTracks } from "../../store/state/trackSelectionState";
 import { Track } from "../../types";
-import { generateRoomCode, getRandomSongSelection } from "../../utils";
+import { getRandomSongSelection } from "../../utils";
 
 /*
  on mount, get first x playlists from this user id.

@@ -136,7 +136,7 @@ export default function useWebsocketSetup() {
                 })
             );
         },
-        startDuel: (roomCode: string) => {
+        startDuel: () => {
             if (!roomCode) {
                 throw new Error("Error: attempted to start duel with no room code");
             }
