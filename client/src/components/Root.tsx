@@ -10,6 +10,7 @@ import useAuthCheck from "./auth/AuthCheck";
 import BlackBackground from "./common/BlackBackground";
 import SexyButton from "./common/SexyButton";
 import Play from "./home/Play";
+import Duel from "./duel/Duel";
 
 export default function Root() {
     useAuthCheck();
@@ -27,7 +28,8 @@ export default function Root() {
     }, []);
 
     if (isLoggedIn(user)) {
-        return <Play />;
+        // return <Play />;
+        return <Duel />;
     }
 
     const loggedInNoSpotify = (user: User) => {

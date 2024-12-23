@@ -2,17 +2,40 @@ import { useEffect, useRef, useState } from "react";
 import useUser from "../hooks/useUser";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { socketResponseSchema } from "../schemas";
-import { SocketResponse } from "../api/WebsocketData";
 import { Answer } from "../types";
+
+enum SocketResponse {
+    Ping = "ping",
+    Answer = "answer",
+    Error = "error",
+    RoomJoined = "room-joined",
+    UserJoined = "user-joined",
+    StartDuel = "start-duel",
+    RoomUpdate = "room-update",
+    LeftRoom = "left-room",
+    Playlist = "playlist",
+}
+
+enum SocketRequest {
+    JoinRoom = "join-room",
+    LeaveRoom = "leave-room",
+    StartDuel = "start-duel",
+    SendPlaylist = "send-playlist",
+    Answer = "answer",
+}
 
 export default function useWebsocketSetup() {
     const socketRef = useRef<WebSocket | null>(null);
+    const user = useUser();
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [lobby, setLobby] = useState<string[]>([]);
+    const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
+    const [isHost, setIsHost] = useState(false);
+    const [playlistUri, setPlaylistUri] = useState("");
+    const [playlistIndexes, setPlaylistIndexes] = useState<number[]>([]);
     const dispatch = useAppDispatch();
-    const user = useUser();
 
     const handleMessage = (message: MessageEvent) => {
         const parsedMessage = socketResponseSchema.safeParse(JSON.parse(message.data));
@@ -41,6 +64,10 @@ export default function useWebsocketSetup() {
                 console.log(`Successfully connected to room`);
                 console.log(`Lobby: ${parsedMessage.data.users}`);
                 setLobby(parsedMessage.data.users as string[]);
+                setRoomCode(parsedMessage.data.roomCode as string);
+                console.log(`isHost: ${parsedMessage.data.host}`);
+
+                setIsHost(parsedMessage.data.host as boolean);
                 break;
             case SocketResponse.UserJoined:
                 console.log(`${parsedMessage.data.user} joined the room!`);
@@ -56,6 +83,17 @@ export default function useWebsocketSetup() {
                 console.log(`Room Update`);
                 //more evil type casting
                 setLobby(parsedMessage.data.room as string[]);
+                break;
+            case SocketResponse.LeftRoom:
+                console.log("Successfully left room");
+                setRoomCode("");
+                setLobby([]);
+                setStartSignal(false);
+                setAnswers([]);
+                break;
+            case SocketResponse.Playlist:
+                setPlaylistUri(parsedMessage.data.playlist_uri as string);
+                setPlaylistIndexes(parsedMessage.data.playlist_indexes as number[]);
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -96,7 +134,11 @@ export default function useWebsocketSetup() {
         loading,
         sendAnswer: (answer: string) => {
             socketRef.current?.send(
-                JSON.stringify({ type: "Answer", from: user.username, answer: answer })
+                JSON.stringify({
+                    type: SocketRequest.Answer,
+                    from: user.username,
+                    answer: answer,
+                })
             );
         },
         answers,
@@ -107,24 +149,42 @@ export default function useWebsocketSetup() {
             setLobby([]);
             socketRef.current?.send(
                 JSON.stringify({
-                    type: "join-room",
+                    type: SocketRequest.JoinRoom,
                     roomCode: roomCode,
                 })
             );
         },
-        startDuel: (roomCode: string) => {
+        startDuel: () => {
             if (!roomCode) {
                 throw new Error("Error: attempted to start duel with no room code");
             }
             socketRef.current?.send(
                 JSON.stringify({
-                    type: "start-duel",
+                    type: SocketRequest.StartDuel,
                     roomCode: roomCode,
+                })
+            );
+        },
+        leaveRoom: () => {
+            socketRef.current?.send(
+                JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
+            );
+        },
+        broadcastPlaylistUri: (uri: string, playlistIndexes: number[]) => {
+            socketRef.current?.send(
+                JSON.stringify({
+                    type: SocketRequest.SendPlaylist,
+                    playlist_uri: uri,
+                    playlist_indexes: playlistIndexes,
                 })
             );
         },
         lobby,
         startSignal,
+        roomCode,
+        isHost,
+        playlistUri,
+        playlistIndexes,
     };
 }
 
