@@ -17,13 +17,14 @@ enum SocketResponse {
 
 export default function useWebsocketSetup() {
     const socketRef = useRef<WebSocket | null>(null);
+    const user = useUser();
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [lobby, setLobby] = useState<string[]>([]);
     const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
+    const [isHost, setIsHost] = useState(false);
     const dispatch = useAppDispatch();
-    const user = useUser();
 
     const handleMessage = (message: MessageEvent) => {
         const parsedMessage = socketResponseSchema.safeParse(JSON.parse(message.data));
@@ -53,6 +54,9 @@ export default function useWebsocketSetup() {
                 console.log(`Lobby: ${parsedMessage.data.users}`);
                 setLobby(parsedMessage.data.users as string[]);
                 setRoomCode(parsedMessage.data.roomCode as string);
+                console.log(`isHost: ${parsedMessage.data.host}`);
+
+                setIsHost(parsedMessage.data.host as boolean);
                 break;
             case SocketResponse.UserJoined:
                 console.log(`${parsedMessage.data.user} joined the room!`);
@@ -151,6 +155,7 @@ export default function useWebsocketSetup() {
         lobby,
         startSignal,
         roomCode,
+        isHost,
     };
 }
 

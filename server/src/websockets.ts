@@ -96,7 +96,8 @@ export const configureWebsocketServer = (server: Server) => {
 
                     console.log(`${roomCode} Lobby: ${lobby}`);
 
-                    sendMessage(ws, {type: SocketResponse.RoomJoined, roomCode: roomCode, users: lobby})
+                    const isHost = rooms[roomCode].users.size === 1
+                    sendMessage(ws, {type: SocketResponse.RoomJoined, roomCode: roomCode, users: lobby, host: isHost})
 
                     sendMessageToRoom(roomCode, { type: SocketResponse.UserJoined, user: user });
                 } else {
