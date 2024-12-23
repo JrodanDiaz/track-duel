@@ -2,14 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import useUser from "../hooks/useUser";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { socketResponseSchema } from "../schemas";
-import { SocketResponse } from "../api/WebsocketData";
 import { Answer } from "../types";
+
+enum SocketResponse {
+    Ping = "Ping",
+    Answer = "Answer",
+    Error = "error",
+    RoomJoined = "room-joined",
+    UserJoined = "user-joined",
+    StartDuel = "start-duel",
+    RoomUpdate = "room-update",
+    LeftRoom = "left-room",
+}
 
 export default function useWebsocketSetup() {
     const socketRef = useRef<WebSocket | null>(null);
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [lobby, setLobby] = useState<string[]>([]);
+    const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
     const dispatch = useAppDispatch();
     const user = useUser();
@@ -41,6 +52,7 @@ export default function useWebsocketSetup() {
                 console.log(`Successfully connected to room`);
                 console.log(`Lobby: ${parsedMessage.data.users}`);
                 setLobby(parsedMessage.data.users as string[]);
+                setRoomCode(parsedMessage.data.roomCode as string);
                 break;
             case SocketResponse.UserJoined:
                 console.log(`${parsedMessage.data.user} joined the room!`);
@@ -56,6 +68,14 @@ export default function useWebsocketSetup() {
                 console.log(`Room Update`);
                 //more evil type casting
                 setLobby(parsedMessage.data.room as string[]);
+                break;
+            case SocketResponse.LeftRoom:
+                console.log("Successfully left room");
+                setRoomCode("");
+                setLobby([]);
+                setStartSignal(false);
+                setAnswers([]);
+
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
@@ -123,8 +143,14 @@ export default function useWebsocketSetup() {
                 })
             );
         },
+        leaveRoom: () => {
+            socketRef.current?.send(
+                JSON.stringify({ type: "leave-room", roomCode: roomCode })
+            );
+        },
         lobby,
         startSignal,
+        roomCode,
     };
 }
 

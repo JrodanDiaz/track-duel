@@ -2,6 +2,20 @@ import { IncomingMessage, Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import { rooms, userRoomMap } from "./handlers/roomHandler";
 
+enum SocketRequest {
+    JoinRoom = "join-room",
+    LeaveRoom = "leave-room",
+    StartDuel = "start-duel"
+}
+
+enum SocketResponse {
+    UserJoined = "user-joined",
+    RoomJoined = "room-joined",
+    Error = "error",
+    StartDuel = "start-duel",
+    LeftRoom = "left-room"
+}
+
 const userSocketMap = new Map<WebSocket, string>();
 
 const sendMessage = (ws: WebSocket, message: Object) => {
@@ -23,6 +37,29 @@ const sendMessageToRoom = (roomCode: string, message: Object) => {
 const getUsersFromRoom = (roomCode: string) => {
     return Array.from(rooms[roomCode].users).map((socket) => userSocketMap.get(socket));
 };
+
+const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
+    const user = userSocketMap.get(socket)
+    if(!user) throw new Error("Error: Cannot remove user that is absent from UserSocketMap")
+    if (rooms[roomCode]) {
+
+        rooms[roomCode].users.delete(socket);
+        console.log(`Removed ${user} from room ${roomCode}`);
+
+        if (rooms[roomCode].users.size === 0) {
+            delete rooms[roomCode];
+            console.log(`Deleted empty room ${roomCode}`);
+        } else {
+            const room = getUsersFromRoom(roomCode);
+            sendMessageToRoom(roomCode, { type: "room-update", room: room });
+        }
+    }
+    if (userRoomMap[user]) {
+        delete userRoomMap[user];
+        console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
+    }
+
+}
 
 export const configureWebsocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
@@ -48,7 +85,7 @@ export const configureWebsocketServer = (server: Server) => {
             console.log(`Received Websocket Message: ${msg.toString()}`);
             const parsedMessage = JSON.parse(msg.toString());
 
-            if (parsedMessage.type === "join-room" && parsedMessage.roomCode) {
+            if (parsedMessage.type === SocketRequest.JoinRoom && parsedMessage.roomCode) {
                 //disgusting type cast to stop TS from crying. Is Zod validation really necessary
                 roomCode = parsedMessage.roomCode as string;
                 if (rooms[roomCode]) {
@@ -59,15 +96,19 @@ export const configureWebsocketServer = (server: Server) => {
 
                     console.log(`${roomCode} Lobby: ${lobby}`);
 
-                    sendMessage(ws, {type: "room-joined", users: lobby})
+                    sendMessage(ws, {type: SocketResponse.RoomJoined, roomCode: roomCode, users: lobby})
 
-                    sendMessageToRoom(roomCode, { type: "user-joined", user: user });
+                    sendMessageToRoom(roomCode, { type: SocketResponse.UserJoined, user: user });
                 } else {
-                    sendMessage(ws, {type: "error", message: "Room not found"})
+                    sendMessage(ws, {type: SocketResponse.Error, message: "Room not found"})
                 }
-            } else if (parsedMessage.type === "start-duel" && parsedMessage.roomCode) {
-                sendMessageToRoom(parsedMessage.roomCode, {type: "start-duel"})
-            } else {
+            } else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
+                sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel})
+            } else if(parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
+                removeUserFromRoom(roomCode, ws)
+                sendMessage(ws, {type: SocketResponse.LeftRoom})
+            } 
+            else {
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(msg, { binary: isBinary });
@@ -78,25 +119,28 @@ export const configureWebsocketServer = (server: Server) => {
 
         ws.on("close", () => {
             console.log("Connection closed...");
+            
+            if(roomCode) {
+                removeUserFromRoom(roomCode, ws)
+            }
             userSocketMap.delete(ws);
+            // if (roomCode && rooms[roomCode]) {
 
-            if (roomCode && rooms[roomCode]) {
+            //     rooms[roomCode].users.delete(ws);
+            //     console.log(`Removed ${user} from room ${roomCode}`);
 
-                rooms[roomCode].users.delete(ws);
-                console.log(`Removed ${user} from room ${roomCode}`);
-
-                if (rooms[roomCode].users.size === 0) {
-                    delete rooms[roomCode];
-                    console.log(`Deleted empty room ${roomCode}`);
-                } else {
-                    const room = getUsersFromRoom(roomCode);
-                    sendMessageToRoom(roomCode, { type: "room-update", room: room });
-                }
-            }
-            if (userRoomMap[user]) {
-                delete userRoomMap[user];
-                console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
-            }
+            //     if (rooms[roomCode].users.size === 0) {
+            //         delete rooms[roomCode];
+            //         console.log(`Deleted empty room ${roomCode}`);
+            //     } else {
+            //         const room = getUsersFromRoom(roomCode);
+            //         sendMessageToRoom(roomCode, { type: "room-update", room: room });
+            //     }
+            // }
+            // if (userRoomMap[user]) {
+            //     delete userRoomMap[user];
+            //     console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
+            // }
 
             console.log(`${user} disconnected...`);
         });
