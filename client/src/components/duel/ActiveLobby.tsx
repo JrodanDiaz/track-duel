@@ -2,25 +2,23 @@ import { useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "./Duel";
 import Button from "../common/Button";
 import { getSavedPlaylists } from "../../api/playlist";
-import PlaylistsContainer from "../home/PlaylistsContainer";
 import { test_uris } from "../../playlists";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
-import { useNavigate } from "react-router-dom";
 import { updatePlaylist } from "../../store/state/playlistState";
-import {
-    getRandomPlaylistIndexes,
-    getRandomSongSelection,
-    getSongsFromIndexes,
-} from "../../utils";
+import { getRandomPlaylistIndexes, getSongsFromIndexes } from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
-import Playlist from "../home/Playlist";
+import Playlist from "../common/Playlist";
+import PlaylistSelection from "../common/PlaylistsSelection";
+import PlayersContainer from "./PlayersContainer";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
+    const [clipboardSuccess, setClipboardSuccess] = useState<boolean | undefined>(
+        undefined
+    );
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);
@@ -49,8 +47,20 @@ export default function ActiveLobby() {
         setConfirmedPlaylistUri(selectedPlaylistUri);
     };
 
+    const handleClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(socket.roomCode);
+            setClipboardSuccess(true);
+        } catch (err) {
+            setClipboardSuccess(false);
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
         if (!socket.isHost) return;
+        console.log(`Attempting to get playlists`);
+
         getSavedPlaylists({ offset: offset }).then(
             ([noSavedPlaylists, playlists, errorMessage]) => {
                 if (noSavedPlaylists) {
@@ -60,7 +70,7 @@ export default function ActiveLobby() {
                 } else if (playlists === undefined) {
                     setSavedPlaylistsError("Internal Server Error");
                 } else {
-                    //this dumb hack ensures that the array has no duplicate elements thanks to React Strict Mode
+                    //ensure array has no duplicate elements thanks to React Strict Mode
                     const updatedPlaylists =
                         savedPlaylists.length === 0
                             ? playlists
@@ -73,6 +83,10 @@ export default function ActiveLobby() {
 
     useEffect(() => {
         if (isSuccess && socket.isHost) {
+            if (!confirmedPlaylistUri) {
+                console.error("Error: Attempting to broadcast undefined playlist uri");
+                return;
+            }
             dispatch(updatePlaylist(playlistData));
             // const randomSelection = getRandomSongSelection(playlistData);
             const playlistIndexes = getRandomPlaylistIndexes(
@@ -80,7 +94,7 @@ export default function ActiveLobby() {
             );
 
             dispatch(updateTracks(getSongsFromIndexes(playlistIndexes, playlistData)));
-            socket.broadcastPlaylistUri(confirmedPlaylistUri!, playlistIndexes);
+            socket.broadcastPlaylistUri(confirmedPlaylistUri, playlistIndexes);
         }
     }, [isSuccess, playlistData]);
 
@@ -98,83 +112,78 @@ export default function ActiveLobby() {
     useEffect(() => {
         setConfirmedPlaylistUri(socket.playlistUri);
     }, [socket.playlistUri]);
-
     return (
         <>
             <div className="flex flex-col items-center justify-center">
-                <h1 className="text-6xl font-bebas text-offwhite my-4">Lobby</h1>
-                <h1 className="text-3xl text-offwhite">
-                    Room Code:{" "}
-                    <span className="text-main-green text-3xl">{socket.roomCode}</span>
-                </h1>
-                <div className="flex flex-col gap-2 p-4 border-2 border-gray-500 rounded-sm w-1/4">
-                    {socket.lobby.map((player, i) => (
-                        <li
-                            className={`${
-                                i % 2 === 0 ? "text-surface75" : "text-offwhite"
-                            } text-xl list-none`}
-                            key={`${player}-${i}`}
-                        >
-                            {player}
-                        </li>
-                    ))}
-                </div>
-                <Button
-                    content="Leave Room"
-                    className="text-2xl"
-                    onClick={handleLeaveRoom}
-                />
-                {socket.isHost && (
-                    <>
-                        {getSavedPlaylistsError && (
-                            <p className="text-red-700">{getSavedPlaylistsError}</p>
-                        )}
-                        <PlaylistsContainer
-                            className="flex flex-wrap p-2"
-                            uris={
-                                savedPlaylists.length > 0
-                                    ? [...test_uris, ...savedPlaylists]
-                                    : test_uris
-                            }
-                            setPlaylistUri={setSelectedPlaylistUri}
-                        />
-                        <Button
-                            content="Load More Playlists"
-                            onClick={() => incrementOffset()}
-                            disabled={getSavedPlaylistsError.length > 0}
-                        />
-                    </>
-                )}
-                {!socket.isHost && confirmedPlaylistUri && (
-                    <>
-                        <p className="text-6xl text-offwhite font-bebas">
-                            Playlist Locked In
-                        </p>
-                        <Playlist uri={confirmedPlaylistUri} imageSize={225} />
-                    </>
-                )}
-                {selectedPlaylistUri && !isSuccess && (
-                    <>
-                        <button
-                            onClick={() => handleLockInPlaylist()}
-                            className=" px-3 py-5 border-2 border-main-green text-main-green font-bold hover:text-main-black hover:bg-main-green"
-                        >
-                            {isLoading ? "Loading" : "Lock In Playlist"}
-                        </button>
-                    </>
-                )}
-                {socket.playlistIndexes.length > 0 && (
-                    <p className="text-2xl text-orangey">
-                        {JSON.stringify(socket.playlistIndexes)}
+                {clipboardSuccess === true && (
+                    <p className="text-main-green mt-4">
+                        Successfully copied to clipboard
                     </p>
                 )}
-                {isSuccess && socket.isHost && (
-                    <Button
-                        content="Start Duel"
-                        className="text-2xl text-red-700 border-red-700"
-                        onClick={() => socket.startDuel()}
-                    />
-                )}
+                <Button
+                    content="Leave Room"
+                    className="text-2xl rounded-sm text-red-600 border-red-600 transition-colors hover:bg-red-600 hover:text-black"
+                    onClick={handleLeaveRoom}
+                />
+                <div className="w-full h-screen overflow-hidden p-4 border-[1px] border-gray-600 flex justify-between">
+                    <div className="border-[1px] w-2/5 w-3/5 border-blue-600 text-offwhite overflow-scroll">
+                        {socket.isHost && (
+                            <>
+                                <PlaylistSelection
+                                    className="flex flex-col overflow-scroll"
+                                    uris={
+                                        savedPlaylists.length > 0
+                                            ? [...test_uris, ...savedPlaylists]
+                                            : test_uris
+                                    }
+                                    setPlaylistUri={setSelectedPlaylistUri}
+                                    selectedPlaylistUri={selectedPlaylistUri}
+                                    fetchPlaylistSuccess={isSuccess}
+                                    handleLockIn={handleLockInPlaylist}
+                                />
+                                <Button
+                                    content={
+                                        getSavedPlaylistsError
+                                            ? getSavedPlaylistsError
+                                            : "+  +  +  Load More Playlists  +  +  +"
+                                    }
+                                    className="h-[125px] w-full text-2xl font-kanit tracking-wide"
+                                    onClick={() => incrementOffset()}
+                                    disabled={getSavedPlaylistsError.length > 0}
+                                />
+                            </>
+                        )}
+                        {!socket.isHost && confirmedPlaylistUri && (
+                            <>
+                                <p className="text-6xl text-offwhite font-bebas">
+                                    Playlist Locked In
+                                </p>
+                                <Playlist uri={confirmedPlaylistUri} imageSize={225} />
+                            </>
+                        )}
+                        {socket.playlistIndexes.length > 0 && (
+                            <p className="text-2xl text-orangey">
+                                {JSON.stringify(socket.playlistIndexes)}
+                            </p>
+                        )}
+                        {isSuccess && socket.isHost && (
+                            <Button
+                                content="Start Duel"
+                                className="text-2xl text-red-700 border-red-700"
+                                onClick={() => socket.startDuel()}
+                            />
+                        )}
+                    </div>
+                    {/* <div className="border-[1px] border-orangey">
+                        <p className="text-xl text-offwhite">what the hell</p>
+                    </div> */}
+                    <div className="border-[1px] w-1/5 w-2/5 border-red-700 text-offwhite">
+                        <header className="text-2xl text-offwhite font-semibold font-kanit text-center">
+                            Connected Gooners
+                        </header>
+                        <PlayersContainer players={socket.lobby} />
+                    </div>
+                </div>
             </div>
         </>
     );

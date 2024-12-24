@@ -78,3 +78,13 @@ export const getToken = async (): Promise<string> => {
   export const isLoggedIn = (user: User) => {
     return user.username && user.spotifyToken && user.authToken
   }
+
+  export const logout = async () => {
+    localStorage.clear()
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, {
+      method: "POST",
+      credentials: "include"
+    })
+
+    return response.ok
+  }

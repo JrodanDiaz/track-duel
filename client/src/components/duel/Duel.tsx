@@ -3,12 +3,16 @@ import TrackDuel from "./TrackDuel";
 import useWebsocketSetup, { useWebsocketReturnType } from "../../hooks/useWebsocketSetup";
 import BlackBackground from "../common/BlackBackground";
 import { createContext } from "react";
+import useUser from "../../hooks/useUser";
+import useAuthCheck from "../auth/AuthCheck";
 
 export const WebsocketContext = createContext<useWebsocketReturnType>(
     {} as useWebsocketReturnType
 );
 
 export default function Duel() {
+    useAuthCheck();
+    const user = useUser();
     const ws = useWebsocketSetup();
 
     if (ws.loading)
