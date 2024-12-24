@@ -107,7 +107,9 @@ export default function useWebsocketSetup() {
     useEffect(() => {
         console.log("Running Websocket Setup..");
         if (!user.username) {
-            throw new Error("Username undefined while establishing connection...");
+            // throw new Error("Username undefined while establishing connection...");
+            console.log(`Aborted Websocket Connection, Username is undefined...`);
+            return;
         }
 
         const url = `ws://localhost:3000?user=${user.username}`;
@@ -128,7 +130,7 @@ export default function useWebsocketSetup() {
             console.log("Cleaning up Websocket connection..");
             socketRef.current?.close();
         };
-    }, []);
+    }, [user]);
 
     return {
         loading,

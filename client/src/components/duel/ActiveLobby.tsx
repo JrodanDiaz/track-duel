@@ -70,6 +70,10 @@ export default function ActiveLobby() {
 
     useEffect(() => {
         if (isSuccess && socket.isHost) {
+            if (!confirmedPlaylistUri) {
+                console.error("Error: Attempting to broadcast undefined playlist uri");
+                return;
+            }
             dispatch(updatePlaylist(playlistData));
             // const randomSelection = getRandomSongSelection(playlistData);
             const playlistIndexes = getRandomPlaylistIndexes(
@@ -77,7 +81,7 @@ export default function ActiveLobby() {
             );
 
             dispatch(updateTracks(getSongsFromIndexes(playlistIndexes, playlistData)));
-            socket.broadcastPlaylistUri(confirmedPlaylistUri!, playlistIndexes);
+            socket.broadcastPlaylistUri(confirmedPlaylistUri, playlistIndexes);
         }
     }, [isSuccess, playlistData]);
 
@@ -108,23 +112,7 @@ export default function ActiveLobby() {
                     onClick={handleLeaveRoom}
                 />
                 <div className="w-full h-screen overflow-hidden p-4 border-[1px] border-gray-600 flex justify-between">
-                    <div className="border-[1px] w-1/5 border-red-700 text-offwhite">
-                        Connected Gooners
-                        <PlayersContainer players={socket.lobby} />
-                        {/* <PlayersContainer players={socket.lobby} /> */}
-                        {/* {socket.lobby.map((player, i) => (
-                            <li
-                                className={`${
-                                    i % 2 === 0 ? "text-surface75" : "text-offwhite"
-                                } text-xl list-none`}
-                                key={`${player}-${i}`}
-                            >
-                                {player}
-                            </li>
-                        ))} */}
-                    </div>
                     <div className="border-[1px] w-3/5 border-blue-600 text-offwhite">
-                        Playlists
                         {socket.isHost && (
                             <>
                                 {getSavedPlaylistsError && (
@@ -133,13 +121,17 @@ export default function ActiveLobby() {
                                     </p>
                                 )}
                                 <PlaylistsContainer
-                                    className="flex flex-wrap p-2"
+                                    className="flex flex-col overflow-scroll"
+                                    // className="flex flex-wrap p-2"
                                     uris={
                                         savedPlaylists.length > 0
                                             ? [...test_uris, ...savedPlaylists]
                                             : test_uris
                                     }
                                     setPlaylistUri={setSelectedPlaylistUri}
+                                    selectedPlaylistUri={selectedPlaylistUri}
+                                    fetchPlaylistSuccess={isSuccess}
+                                    handleLockIn={handleLockInPlaylist}
                                 />
                                 <Button
                                     content="Load More Playlists"
@@ -156,16 +148,6 @@ export default function ActiveLobby() {
                                 <Playlist uri={confirmedPlaylistUri} imageSize={225} />
                             </>
                         )}
-                        {selectedPlaylistUri && !isSuccess && (
-                            <>
-                                <button
-                                    onClick={() => handleLockInPlaylist()}
-                                    className=" px-3 py-5 border-2 border-main-green text-main-green font-bold hover:text-main-black hover:bg-main-green"
-                                >
-                                    {isLoading ? "Loading" : "Lock In Playlist"}
-                                </button>
-                            </>
-                        )}
                         {socket.playlistIndexes.length > 0 && (
                             <p className="text-2xl text-orangey">
                                 {JSON.stringify(socket.playlistIndexes)}
@@ -179,86 +161,13 @@ export default function ActiveLobby() {
                             />
                         )}
                     </div>
+                    <div className="border-[1px] w-1/5 border-red-700 text-offwhite">
+                        <header className="text-2xl text-offwhite font-semibold font-kanit text-center">
+                            Connected Gooners
+                        </header>
+                        <PlayersContainer players={socket.lobby} />
+                    </div>
                 </div>
-            </div>
-        </>
-    );
-
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center">
-                <h1 className="text-6xl text-offwhite my-4">
-                    Room Code:{" "}
-                    <span className="text-main-green text-6xl">{socket.roomCode}</span>
-                </h1>
-                <div className="flex flex-col gap-2 p-4 border-2 border-gray-500 rounded-sm w-1/4">
-                    {socket.lobby.map((player, i) => (
-                        <li
-                            className={`${
-                                i % 2 === 0 ? "text-surface75" : "text-offwhite"
-                            } text-xl list-none`}
-                            key={`${player}-${i}`}
-                        >
-                            {player}
-                        </li>
-                    ))}
-                </div>
-                <Button
-                    content="Leave Room"
-                    className="text-2xl"
-                    onClick={handleLeaveRoom}
-                />
-                {socket.isHost && (
-                    <>
-                        {getSavedPlaylistsError && (
-                            <p className="text-red-700">{getSavedPlaylistsError}</p>
-                        )}
-                        <PlaylistsContainer
-                            className="flex flex-wrap p-2"
-                            uris={
-                                savedPlaylists.length > 0
-                                    ? [...test_uris, ...savedPlaylists]
-                                    : test_uris
-                            }
-                            setPlaylistUri={setSelectedPlaylistUri}
-                        />
-                        <Button
-                            content="Load More Playlists"
-                            onClick={() => incrementOffset()}
-                            disabled={getSavedPlaylistsError.length > 0}
-                        />
-                    </>
-                )}
-                {!socket.isHost && confirmedPlaylistUri && (
-                    <>
-                        <p className="text-6xl text-offwhite font-bebas">
-                            Playlist Locked In
-                        </p>
-                        <Playlist uri={confirmedPlaylistUri} imageSize={225} />
-                    </>
-                )}
-                {selectedPlaylistUri && !isSuccess && (
-                    <>
-                        <button
-                            onClick={() => handleLockInPlaylist()}
-                            className=" px-3 py-5 border-2 border-main-green text-main-green font-bold hover:text-main-black hover:bg-main-green"
-                        >
-                            {isLoading ? "Loading" : "Lock In Playlist"}
-                        </button>
-                    </>
-                )}
-                {socket.playlistIndexes.length > 0 && (
-                    <p className="text-2xl text-orangey">
-                        {JSON.stringify(socket.playlistIndexes)}
-                    </p>
-                )}
-                {isSuccess && socket.isHost && (
-                    <Button
-                        content="Start Duel"
-                        className="text-2xl text-red-700 border-red-700"
-                        onClick={() => socket.startDuel()}
-                    />
-                )}
             </div>
         </>
     );

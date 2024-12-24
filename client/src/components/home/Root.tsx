@@ -1,6 +1,5 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { isLoggedIn } from "../../api/auth";
 import { setSpotifyToken, handleSpotifyRedirect } from "../../api/spotify";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useUser from "../../hooks/useUser";
@@ -9,7 +8,6 @@ import { User } from "../../types";
 import useAuthCheck from "../auth/AuthCheck";
 import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
-import Duel from "../duel/Duel";
 import Navbar from "../common/Navbar";
 import AlbumScroll from "./AlbumScroll";
 
@@ -28,9 +26,6 @@ export default function Root() {
         }
     }, []);
 
-    if (isLoggedIn(user)) {
-        return <Duel />;
-    }
 
     const loggedInNoSpotify = (user: User) => {
         return user.username && user.authToken && !user.spotifyToken;
@@ -56,7 +51,7 @@ export default function Root() {
                         )}
                     </div>
                     <div className=" w-full flex justify-center items-center gap-8 mt-10">
-                        {loggedInNoSpotify(user) ? (
+                        {loggedInNoSpotify(user) && (
                             <SexyButton
                                 bg="bg-main-green"
                                 text="text-main-green text-xl"
@@ -65,18 +60,28 @@ export default function Root() {
                                 px="px-12"
                                 onClick={handleSpotifyRedirect}
                             />
-                        ) : (
-                            <>
-                                <Link to="/login">
-                                    <SexyButton
-                                        bg="bg-main-green"
-                                        text="text-main-green text-xl"
-                                        border="border-main-green"
-                                        content="Sign In"
-                                        px="px-12"
-                                    />
-                                </Link>
-                            </>
+                        )}
+                        {!user.username && !user.authToken && (
+                            <Link to="/login">
+                                <SexyButton
+                                    bg="bg-main-green"
+                                    text="text-main-green text-xl"
+                                    border="border-main-green"
+                                    content="Sign In"
+                                    px="px-12"
+                                />
+                            </Link>
+                        )}
+                        {user.username && user.authToken && user.spotifyToken && (
+                            <Link to="/duel">
+                                <SexyButton
+                                    bg="bg-main-green"
+                                    text="text-main-green text-xl"
+                                    border="border-main-green"
+                                    content="Start Duel"
+                                    px="px-12"
+                                />
+                            </Link>
                         )}
                     </div>
                     <AlbumScroll />

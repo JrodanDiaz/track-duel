@@ -84,12 +84,12 @@ export default function InactiveLobby() {
                             placeholder="Enter Room Code"
                             value={joinCode}
                             onChange={setJoinCode}
-                            className="border-blue-600 border-r-transparent font-kanit"
+                            className="!border-blue-600 border-r-transparent font-kanit"
                         />
                         <Button
                             content="JOIN"
                             submit={true}
-                            className="rounded-sm border-transparent bg-blue-600 text-offwhite px-8 font-kanit"
+                            className="rounded-sm border-transparent !bg-blue-600 text-offwhite px-8 font-kanit"
                         />
                     </div>
                 </form>
