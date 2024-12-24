@@ -4,17 +4,15 @@ import useUser from "../../hooks/useUser";
 import BlackBackground from "../common/BlackBackground";
 import Button from "../common/Button";
 import Navbar from "../common/Navbar";
-import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
     const user = useUser();
     const [logoutError, setLogoutError] = useState("");
-    const navigate = useNavigate();
 
     const handleSignOut = () => {
         logout().then((success) => {
             if (!success) setLogoutError("Error: Failed to log out (wtf)");
-            else navigate("/");
+            else window.location.href = "/";
         });
     };
     return (

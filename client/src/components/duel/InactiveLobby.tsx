@@ -36,10 +36,11 @@ export default function InactiveLobby() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <h1 className="text-6xl text-offwhite font-bebas my-6">
-                Lobby {socket.roomCode && socket.roomCode}
+        <div className="flex flex-col items-center justify-center gap-5">
+            <h1 className="text-6xl text-offwhite font-bebas font-kanit my-6">
+                Welcome, {user.username}
             </h1>
+            <img src="/matrix.png" width={300} height={300} />
             <div
                 className={`flex w-1/4 ${
                     socket.lobby.length > 0 ? "justify-center" : "justify-between"
@@ -48,17 +49,17 @@ export default function InactiveLobby() {
                 {socket.lobby.length === 0 && (
                     <>
                         <Button
-                            content="Join Room"
-                            className=" transition-all duration-200 hover:text-black hover:bg-main-green text-2xl"
-                            onClick={() => setLobbyChoice(LobbyChoice.Join)}
-                        />
-                        <Button
                             content="Create Room"
-                            className=" transition-all duration-200 hover:text-black hover:bg-main-green text-2xl"
+                            className="border-red-600 text-red-600 transition-all duration-200 hover:text-black hover:bg-red-600 text-2xl rounded-sm font-kanit"
                             onClick={() => {
                                 setLobbyChoice(LobbyChoice.Create);
                                 handleCreateRoomClick();
                             }}
+                        />
+                        <Button
+                            content="Join Room"
+                            className=" border-blue-600 text-blue-600 transition-all duration-200 hover:text-black hover:bg-blue-600 text-2xl rounded-sm font-kanit"
+                            onClick={() => setLobbyChoice(LobbyChoice.Join)}
                         />
                     </>
                 )}
@@ -74,13 +75,23 @@ export default function InactiveLobby() {
                 </p>
             )}
             {lobbyChoice === LobbyChoice.Join && (
-                <form onSubmit={handleJoinRoomSubmit}>
-                    <Input
-                        placeholder="Enter Room Code"
-                        value={joinCode}
-                        onChange={setJoinCode}
-                    />
-                    <Button content="Join" submit={true} />
+                <form
+                    onSubmit={handleJoinRoomSubmit}
+                    className="w-1/2 flex flex-col justify-center items-center"
+                >
+                    <div>
+                        <Input
+                            placeholder="Enter Room Code"
+                            value={joinCode}
+                            onChange={setJoinCode}
+                            className="border-blue-600 border-r-transparent font-kanit"
+                        />
+                        <Button
+                            content="JOIN"
+                            submit={true}
+                            className="rounded-sm border-transparent bg-blue-600 text-offwhite px-8 font-kanit"
+                        />
+                    </div>
                 </form>
             )}
         </div>

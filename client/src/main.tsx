@@ -13,6 +13,7 @@ import ErrorPage from "./components/common/ErrorPage.tsx";
 import Duel from "./components/duel/Duel.tsx";
 import Play from "./components/Play.tsx";
 import Profile from "./components/profile/Profile.tsx";
+import About from "./components/about/About.tsx";
 
 const router = createBrowserRouter([
     {
@@ -53,6 +54,11 @@ const router = createBrowserRouter([
     {
         path: "/profile",
         element: <Profile />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/about",
+        element: <About />,
         errorElement: <ErrorPage />,
     },
 ]);

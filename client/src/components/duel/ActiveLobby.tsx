@@ -96,10 +96,9 @@ export default function ActiveLobby() {
     return (
         <>
             <div className="flex flex-col items-center justify-center">
-                <h1 className="text-6xl font-bebas text-offwhite my-4">Lobby</h1>
-                <h1 className="text-3xl text-offwhite">
+                <h1 className="text-6xl text-offwhite my-4">
                     Room Code:{" "}
-                    <span className="text-main-green text-3xl">{socket.roomCode}</span>
+                    <span className="text-main-green text-6xl">{socket.roomCode}</span>
                 </h1>
                 <div className="flex flex-col gap-2 p-4 border-2 border-gray-500 rounded-sm w-1/4">
                     {socket.lobby.map((player, i) => (

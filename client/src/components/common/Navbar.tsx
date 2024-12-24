@@ -13,7 +13,7 @@ export const NavbarLink = ({
     return (
         <Link
             to={to}
-            className={`text-offwhite text-xl font-lato relative group ${className}`}
+            className={`text-offwhite text-xl font-lato tracking-wide relative group ${className}`}
         >
             {content}
             <div className="absolute top-10 w-full h-0.5 h-1 bg-white/80 scale-x-0 group-hover:scale-x-100 transition-all duration-200  group-hover:bg-main-green/80"></div>
@@ -25,7 +25,7 @@ export default function Navbar() {
     const user = useUser();
 
     return (
-        <nav className="border-[1px] border-gray-900 w-full flex justify-between items-center p-2 transition-colors duration-500 hover:border-b-main-green">
+        <nav className="border-[1px] border-transparent w-full flex justify-between items-center p-2 transition-colors duration-500 hover:border-b-offwhite/30">
             <div className="text-6xl text-main-green font-bebas w-3/5 pl-16">
                 TRACK DUEL
             </div>
@@ -38,19 +38,6 @@ export default function Navbar() {
                 <NavbarLink to="/login" content="Login" className="  text-lilac" />
             )}
             <div></div>
-            {/* <Link to={"/profile"} className={`text-offwhite text-xl font-lato`}>
-                Profile
-            </Link>
-            <Link to={"/about"} className={`text-offwhite text-xl font-lato`}>
-                About
-            </Link>
-            <Link
-                to={"/leaderboard"}
-                className={`text-offwhite text-xl font-lato relative group`}
-            >
-                Leaderboard
-                <div className="absolute w-full h-0.5 bg-white/80 scale-x-0 group-hover:scale-x-100 transition-transform"></div>
-            </Link> */}
         </nav>
     );
 }

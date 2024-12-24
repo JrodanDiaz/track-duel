@@ -27,6 +27,16 @@ const config: Config = {
         "surface25": "#42433d"
 
       },
+      keyframes: {
+        "scroll": {
+          "0%": {transform: "translateX(100%)"},
+          "100%": {transform: "translateX(-100%)"}
+
+        }
+      },
+      animation: {
+        scroll: 'scroll 15s linear infinite'
+      },
       fontFamily: {
         "bebas": ["Bebas Neue, sans-serif"],
         "protest": ["Protest Strike, sans-serif"],

@@ -11,6 +11,7 @@ import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
 import Duel from "../duel/Duel";
 import Navbar from "../common/Navbar";
+import AlbumScroll from "./AlbumScroll";
 
 export default function Root() {
     useAuthCheck();
@@ -39,10 +40,10 @@ export default function Root() {
         <>
             <BlackBackground>
                 <Navbar />
-                <div className=" w-full flex flex-col justify-center items-center mt-8">
+                <div className=" w-full flex flex-col justify-center items-center mt-24">
                     <div className=" w-10/12 flex flex-col justify-center items-center text-center">
-                        <h1 className=" text-offwhite text-9xl font-protest">
-                            Track Duel
+                        <h1 className=" text-offwhite text-7xl font-lato">
+                            This website is illegal
                         </h1>
                         <p className=" text-surface75 text-2xl mt-4">
                             Choose a Playlist, Album, or Artist, and be the first to guess
@@ -53,9 +54,6 @@ export default function Root() {
                                 Welcome back, {user.username}
                             </p>
                         )}
-                        <Link to="/testing" className="text-main-green my-4">
-                            to /testing
-                        </Link>
                     </div>
                     <div className=" w-full flex justify-center items-center gap-8 mt-10">
                         {loggedInNoSpotify(user) ? (
@@ -69,15 +67,6 @@ export default function Root() {
                             />
                         ) : (
                             <>
-                                <Link to="/register">
-                                    <SexyButton
-                                        bg="bg-orangey"
-                                        text="text-orangey text-xl"
-                                        border="border-orangey"
-                                        content="Register"
-                                        px="px-12"
-                                    />
-                                </Link>
                                 <Link to="/login">
                                     <SexyButton
                                         bg="bg-main-green"
@@ -90,6 +79,7 @@ export default function Root() {
                             </>
                         )}
                     </div>
+                    <AlbumScroll />
                 </div>
                 <div className="w-full h-full"></div>
             </BlackBackground>
