@@ -58,7 +58,7 @@ export default function InactiveLobby() {
                         />
                         <Button
                             content="Join Room"
-                            className=" border-blue-600 text-blue-600 transition-all duration-200 hover:text-black hover:bg-blue-600 text-2xl rounded-sm font-kanit"
+                            className=" !border-blue-600 !text-blue-600 transition-all duration-200 hover:!text-black hover:bg-blue-600 text-2xl rounded-sm font-kanit"
                             onClick={() => setLobbyChoice(LobbyChoice.Join)}
                         />
                     </>

@@ -32,6 +32,7 @@ const getUserFromRequest = (req: IncomingMessage) => {
 };
 
 const sendMessageToRoom = (roomCode: string, message: Object) => {
+    if(!rooms[roomCode]) throw new Error("Attempting to send message to nonexistant room")
     rooms[roomCode].users.forEach((socket) => {
         socket.send(JSON.stringify(message));
     });
