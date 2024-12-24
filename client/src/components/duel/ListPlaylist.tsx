@@ -33,7 +33,7 @@ export default function ListPlaylist({
 
     return (
         <div
-            className={`flex items-center justify-between pr-8 cursor-pointer border-[1px] border-y-offwhite/50 bg-transparent ${
+            className={`flex items-center justify-between pr-8 cursor-pointer border-[1px] border-y-offwhite/50 bg-transparent group ${
                 selectedIndex === index && "!bg-main-green"
             } ${classname}`}
             onClick={() => {
@@ -49,7 +49,9 @@ export default function ListPlaylist({
                 <p
                     className={`${
                         selectedIndex === index ? "text-black" : "text-offwhite"
-                    } text-2xl font-kanit`}
+                    } text-2xl font-kanit ${
+                        selectedPlaylistUri !== uri && "group-hover:text-main-green"
+                    }`}
                 >
                     {data.name}
                 </p>

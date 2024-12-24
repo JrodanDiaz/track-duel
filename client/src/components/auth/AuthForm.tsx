@@ -55,7 +55,7 @@ export default function AuthForm({ authAction, title }: Props) {
             <BlackBackground>
                 <div className="w-full h-full flex flex-col justify-center items-center">
                     <div className=" border-2 border-offwhite px-4 py-4 flex flex-col items-center justify-evenly gap-4 w-3/12 h-3/5 rounded:sm">
-                        <p className={` text-offwhite text-6xl font-bebas`}>
+                        <p className={` text-offwhite text-6xl font-bebas tracking-wide`}>
                             {authorized ? "Integrate Spotify" : title}
                         </p>
                         <form
