@@ -30,7 +30,8 @@ const config: Config = {
       fontFamily: {
         "bebas": ["Bebas Neue, sans-serif"],
         "protest": ["Protest Strike, sans-serif"],
-        "kanit": ["Kanit, sans-serif"]
+        "kanit": ["Kanit, sans-serif"],
+        "lato": ["Lato, sans-serif"]
       }
     },
   },

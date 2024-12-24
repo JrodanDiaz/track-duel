@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./components/Root.tsx";
+import Root from "./components/home/Root.tsx";
 import RegisterPage from "./components/auth/RegisterPage.tsx";
 import "./index.css";
 import { Provider } from "react-redux";
@@ -10,8 +10,9 @@ import WebsocketTesting from "./components/WebsocketTesting.tsx";
 import LoginPage from "./components/auth/LoginPage.tsx";
 import UnAuthGuard from "./components/auth/UnAuthGuard.tsx";
 import ErrorPage from "./components/common/ErrorPage.tsx";
-import Play from "./components/home/Play.tsx";
 import Duel from "./components/duel/Duel.tsx";
+import Play from "./components/Play.tsx";
+import Profile from "./components/profile/Profile.tsx";
 
 const router = createBrowserRouter([
     {
@@ -47,6 +48,11 @@ const router = createBrowserRouter([
     {
         path: "/testing",
         element: <WebsocketTesting />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/profile",
+        element: <Profile />,
         errorElement: <ErrorPage />,
     },
 ]);

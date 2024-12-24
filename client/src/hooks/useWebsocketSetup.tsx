@@ -166,6 +166,9 @@ export default function useWebsocketSetup() {
             );
         },
         leaveRoom: () => {
+            setPlaylistIndexes([]);
+            setPlaylistUri("");
+            setLobby([]);
             socketRef.current?.send(
                 JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
             );

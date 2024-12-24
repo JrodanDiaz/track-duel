@@ -16,6 +16,7 @@ import {
 import { createServer} from "http";
 import { configureWebsocketServer } from "./websockets";
 import { generateRoomHandler } from "./handlers/roomHandler";
+import { handleSignOut } from "./handlers/SignOutHandler";
 
 dotenv.config();
 const app = express();
@@ -47,6 +48,8 @@ app.post("/users", clearUsersHandler);
 app.post("/register", registerHandler);
 app.post("/login", loginHandler);
 app.get("/implicit_login", implicitLoginHandler);
+
+app.post('/logout', handleSignOut);
 
 app.get("/spotify", spotifyLoginHandler);
 app.get("/auth/callback", spotifyCallbackHandler);

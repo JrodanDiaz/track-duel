@@ -1,16 +1,16 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { isLoggedIn } from "../api/auth";
-import { User } from "../types";
-import { handleSpotifyRedirect, setSpotifyToken } from "../api/spotify";
-import { authenticateSpotify } from "../store/state/userState";
-import useUser from "../hooks/useUser";
-import useAppDispatch from "../hooks/useAppDispatch";
-import useAuthCheck from "./auth/AuthCheck";
-import BlackBackground from "./common/BlackBackground";
-import SexyButton from "./common/SexyButton";
-import Play from "./home/Play";
-import Duel from "./duel/Duel";
+import { isLoggedIn } from "../../api/auth";
+import { setSpotifyToken, handleSpotifyRedirect } from "../../api/spotify";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useUser from "../../hooks/useUser";
+import { authenticateSpotify } from "../../store/state/userState";
+import { User } from "../../types";
+import useAuthCheck from "../auth/AuthCheck";
+import BlackBackground from "../common/BlackBackground";
+import SexyButton from "../common/SexyButton";
+import Duel from "../duel/Duel";
+import Navbar from "../common/Navbar";
 
 export default function Root() {
     useAuthCheck();
@@ -28,7 +28,6 @@ export default function Root() {
     }, []);
 
     if (isLoggedIn(user)) {
-        // return <Play />;
         return <Duel />;
     }
 
@@ -39,6 +38,7 @@ export default function Root() {
     return (
         <>
             <BlackBackground>
+                <Navbar />
                 <div className=" w-full flex flex-col justify-center items-center mt-8">
                     <div className=" w-10/12 flex flex-col justify-center items-center text-center">
                         <h1 className=" text-offwhite text-9xl font-protest">

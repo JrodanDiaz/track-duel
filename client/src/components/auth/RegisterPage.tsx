@@ -1,9 +1,9 @@
 import { RegisterUser } from "../../api/auth";
-import AuthForm from "./AuthForm";
+import AuthForm, { AuthTitles } from "./AuthForm";
 export default function RegisterPage() {
     return (
         <>
-            <AuthForm authAction={RegisterUser} title="Register" />
+            <AuthForm authAction={RegisterUser} title={AuthTitles.Register} />
         </>
     );
 }

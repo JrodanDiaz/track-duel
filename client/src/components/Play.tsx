@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
-import Player from "./Player";
-import PlaylistsContainer from "./PlaylistsContainer";
-import TrackSearchResult from "./TrackSearchResult";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Link, useNavigate } from "react-router-dom";
-import { isLoggedIn } from "../../api/auth";
-import { savePlaylist, getSavedPlaylists } from "../../api/playlist";
-import { getSpotifyToken } from "../../api/spotify";
-import useAppDispatch from "../../hooks/useAppDispatch";
-import useUser from "../../hooks/useUser";
-import { test_uris } from "../../playlists";
-import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice";
-import { updatePlaylist } from "../../store/state/playlistState";
-import { updateTracks } from "../../store/state/trackSelectionState";
-import { Track } from "../../types";
-import { getRandomSongSelection } from "../../utils";
+import { isLoggedIn } from "../api/auth";
+import { savePlaylist, getSavedPlaylists } from "../api/playlist";
+import { getSpotifyToken } from "../api/spotify";
+import useAppDispatch from "../hooks/useAppDispatch";
+import useUser from "../hooks/useUser";
+import { test_uris } from "../playlists";
+import { useGetPlaylistEssentialsQuery } from "../store/api/playlistsApiSlice";
+import { updatePlaylist } from "../store/state/playlistState";
+import { updateTracks } from "../store/state/trackSelectionState";
+import { Track } from "../types";
+import { getRandomSongSelection } from "../utils";
+import Player from "./common/Player";
+import PlaylistsContainer from "./common/PlaylistsContainer";
+import TrackSearchResult from "./common/TrackSearchResult";
 
 /*
  on mount, get first x playlists from this user id.

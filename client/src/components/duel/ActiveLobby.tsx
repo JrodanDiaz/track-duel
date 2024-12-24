@@ -2,25 +2,19 @@ import { useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "./Duel";
 import Button from "../common/Button";
 import { getSavedPlaylists } from "../../api/playlist";
-import PlaylistsContainer from "../home/PlaylistsContainer";
 import { test_uris } from "../../playlists";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetPlaylistEssentialsQuery } from "../../store/api/playlistsApiSlice";
 import useAppDispatch from "../../hooks/useAppDispatch";
-import { useNavigate } from "react-router-dom";
 import { updatePlaylist } from "../../store/state/playlistState";
-import {
-    getRandomPlaylistIndexes,
-    getRandomSongSelection,
-    getSongsFromIndexes,
-} from "../../utils";
+import { getRandomPlaylistIndexes, getSongsFromIndexes } from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
-import Playlist from "../home/Playlist";
+import Playlist from "../common/Playlist";
+import PlaylistsContainer from "../common/PlaylistsContainer";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);

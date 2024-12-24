@@ -5,9 +5,9 @@ import usePlaylist from "../../hooks/usePlaylist";
 import useTrackSelection from "../../hooks/useTrackSelection";
 import BlackBackground from "../common/BlackBackground";
 import SexyButton from "../common/SexyButton";
-import Player from "../home/Player";
 import Input from "../common/Input";
 import { WebsocketContext } from "./Duel";
+import Player from "../common/Player";
 
 export default function TrackDuel() {
     const randomTracks = useTrackSelection();
