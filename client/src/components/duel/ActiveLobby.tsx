@@ -10,7 +10,7 @@ import { updatePlaylist } from "../../store/state/playlistState";
 import { getRandomPlaylistIndexes, getSongsFromIndexes } from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
 import Playlist from "../common/Playlist";
-import PlaylistsContainer from "../common/PlaylistsContainer";
+import PlaylistSelection from "../common/PlaylistsSelection";
 import PlayersContainer from "./PlayersContainer";
 
 export default function ActiveLobby() {
@@ -120,30 +120,16 @@ export default function ActiveLobby() {
                         Successfully copied to clipboard
                     </p>
                 )}
-                {clipboardSuccess === false && (
-                    <p className="text-red-600 mt-4">Failed to copy to clipboard..</p>
-                )}
-                <header className="text-6xl text-offwhite my-4 flex gap-3">
-                    <p>
-                        Room Code:{" "}
-                        <span className="text-main-green text-6xl">
-                            {socket.roomCode}
-                        </span>
-                    </p>
-                    <button onClick={handleClipboard} className="text-xl text-offwhite">
-                        <img src="/clipboard.svg" height={35} width={35} />
-                    </button>
-                </header>
                 <Button
                     content="Leave Room"
                     className="text-2xl rounded-sm text-red-600 border-red-600 transition-colors hover:bg-red-600 hover:text-black"
                     onClick={handleLeaveRoom}
                 />
                 <div className="w-full h-screen overflow-hidden p-4 border-[1px] border-gray-600 flex justify-between">
-                    <div className="border-[1px] w-2/5 border-blue-600 text-offwhite">
+                    <div className="border-[1px] w-2/5 w-3/5 border-blue-600 text-offwhite overflow-scroll">
                         {socket.isHost && (
                             <>
-                                <PlaylistsContainer
+                                <PlaylistSelection
                                     className="flex flex-col overflow-scroll"
                                     uris={
                                         savedPlaylists.length > 0
@@ -188,10 +174,10 @@ export default function ActiveLobby() {
                             />
                         )}
                     </div>
-                    <div className="border-[1px] border-orangey">
+                    {/* <div className="border-[1px] border-orangey">
                         <p className="text-xl text-offwhite">what the hell</p>
-                    </div>
-                    <div className="border-[1px] w-1/5 border-red-700 text-offwhite">
+                    </div> */}
+                    <div className="border-[1px] w-1/5 w-2/5 border-red-700 text-offwhite">
                         <header className="text-2xl text-offwhite font-semibold font-kanit text-center">
                             Connected Gooners
                         </header>

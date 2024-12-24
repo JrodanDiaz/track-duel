@@ -4,13 +4,13 @@ import ListPlaylist from "../duel/ListPlaylist";
 interface Props {
     uris: string[];
     className?: string;
-    setPlaylistUri: React.Dispatch<React.SetStateAction<string | undefined>>;
+    setPlaylistUri?: React.Dispatch<React.SetStateAction<string | undefined>>;
     selectedPlaylistUri?: string;
     fetchPlaylistSuccess?: boolean;
     handleLockIn?: () => void;
 }
 
-export default function PlaylistsContainer({
+export default function PlaylistSelection({
     uris,
     className,
     setPlaylistUri,
@@ -21,7 +21,9 @@ export default function PlaylistsContainer({
     const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
 
     useEffect(() => {
-        setPlaylistUri(selectedIndex === null ? undefined : uris[selectedIndex]);
+        if (setPlaylistUri) {
+            setPlaylistUri(selectedIndex === null ? undefined : uris[selectedIndex]);
+        }
     }, [selectedIndex]);
 
     return (

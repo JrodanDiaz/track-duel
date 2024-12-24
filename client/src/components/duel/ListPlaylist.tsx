@@ -19,7 +19,7 @@ export default function ListPlaylist({
     selectedIndex = -1,
     setSelectedIndex,
     classname = "",
-    imageSize = 125,
+    imageSize = 110,
     selectedPlaylistUri,
     fetchPlaylistSuccess,
     handleLockIn,

@@ -14,8 +14,8 @@ import { updateTracks } from "../store/state/trackSelectionState";
 import { Track } from "../types";
 import { getRandomSongSelection } from "../utils";
 import Player from "./common/Player";
-import PlaylistsContainer from "./common/PlaylistsContainer";
 import TrackSearchResult from "./common/TrackSearchResult";
+import PlaylistContainer from "./common/PlaylistContainer";
 
 /*
  on mount, get first x playlists from this user id.
@@ -144,7 +144,7 @@ export default function Play() {
                 Choose your Track, {user.username}
             </h1>
             <h1 className="text-3xl text-offwhite font-protest"></h1>
-            <PlaylistsContainer
+            <PlaylistContainer
                 className="flex flex-wrap p-2"
                 uris={test_uris}
                 setPlaylistUri={setSelectedPlaylistUri}
@@ -157,7 +157,7 @@ export default function Play() {
             </Link>
             {savedPlaylists.length > 0 && (
                 <>
-                    <PlaylistsContainer
+                    <PlaylistContainer
                         className="flex flex-wrap p-2"
                         uris={savedPlaylists}
                         setPlaylistUri={setSelectedPlaylistUri}
