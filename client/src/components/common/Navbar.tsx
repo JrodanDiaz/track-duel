@@ -23,7 +23,11 @@ export const NavbarLink = ({
     );
 };
 
-export default function Navbar() {
+interface Props {
+    enableRoomcode?: boolean;
+}
+
+export default function Navbar({ enableRoomcode = false }: Props) {
     const user = useUser();
     const socket = useContext(WebsocketContext);
     const [clipboardSuccess, setClipboardSuccess] = useState<boolean | undefined>(
@@ -47,7 +51,7 @@ export default function Navbar() {
         <nav className="border-[1px] border-transparent w-full flex justify-between items-center p-2 transition-colors duration-500 hover:border-b-offwhite/30">
             <div className="text-6xl text-main-green font-bebas w-3/5 pl-16 flex justify-between">
                 TRACK DUEL
-                {socket.roomCode && (
+                {socket.roomCode && enableRoomcode && (
                     <header className="text-5xl text-offwhite my-4 flex gap-3">
                         <p>
                             Room Code:{" "}
