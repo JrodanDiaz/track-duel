@@ -4,14 +4,15 @@ import { getSpotifyToken } from "../../api/spotify";
 import usePlaylist from "../../hooks/usePlaylist";
 import useTrackSelection from "../../hooks/useTrackSelection";
 import BlackBackground from "../common/BlackBackground";
-import SexyButton from "../common/SexyButton";
-import Input from "../common/Input";
 import { WebsocketContext } from "./Duel";
 import Player from "../common/Player";
 import Navbar from "../common/Navbar";
 import Button from "../common/Button";
+import useUser from "../../hooks/useUser";
+import Marquee from "../common/Marquee";
 
 export default function TrackDuel() {
+    const userStore = useUser();
     const randomTracks = useTrackSelection();
     const playlist = usePlaylist();
     const navigate = useNavigate();
@@ -22,7 +23,6 @@ export default function TrackDuel() {
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
     const [score, setScore] = useState<number>(0);
-    const [roomCode, setRoomCode] = useState("");
     const socket = useContext(WebsocketContext);
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,28 +85,39 @@ export default function TrackDuel() {
     return (
         <BlackBackground>
             <Navbar enableRoomcode={false} />
-            <div className="flex flex-col items-center h-screen">
+            {/* <div className="flex flex-col items-center h-screen"> */}
+            <div className="flex justify-center gap-8 h-screen mt-24">
                 {socket.loading && (
                     <p className="text-offwhite">Establishing connection...</p>
                 )}
-                <img src={playlist.images[0].url} height={150} width={150} />
-                <button
-                    onClick={() => selectNextSong()}
-                    className="text-xl text-offwhite"
-                >
-                    Select Next Song
-                </button>
-                <p className="text-xl text-red-700">Score: {score}</p>
-                <Player
-                    accessToken={getSpotifyToken()}
-                    trackUri={randomTracks?.[currentTrackIndex].uri}
-                    play={play}
-                    setPlay={setPlay}
-                />
+                <div className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500">
+                    <img src={playlist.images[0].url} height={150} width={150} />
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <Marquee
+                            content={playlist.name}
+                            className={`text-xl ${
+                                i % 2 === 0 ? "text-offwhite" : "text-surface75"
+                            }`}
+                            reverse={i % 2 === 0}
+                        />
+                    ))}
+                    <button
+                        onClick={() => selectNextSong()}
+                        className="text-xl text-offwhite"
+                    >
+                        Select Next Song
+                    </button>
+                    <Player
+                        accessToken={getSpotifyToken()}
+                        trackUri={randomTracks?.[currentTrackIndex].uri}
+                        play={play}
+                        setPlay={setPlay}
+                    />
+                </div>
 
-                <div className="w-2/5 h-3/5">
+                <div className="w-2/5 h-4/5">
                     <div
-                        className="border-2 border-gray-500 p-5 w-full h-3/5 overflow-y-auto"
+                        className="border-2 border-gray-500 p-5 w-full h-4/5 overflow-y-auto"
                         ref={chatContainerRef}
                     >
                         {socket.answers.length === 0 && (
@@ -124,24 +135,28 @@ export default function TrackDuel() {
                             </p>
                         ))}
                     </div>
-                    {correct ? (
-                        <p className="text-3xl text-main-green">CORRECT ANSWER</p>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="w-full">
-                            <input
-                                type="text"
-                                className="px-5 py-3 focus:outline-none border-2 border-main-green bg-transparent text-offwhite w-4/5 text-xl font-kanit"
-                                placeholder="Enter answer here"
-                                value={answer}
-                                onChange={(e) => setAnswer(e.target.value)}
-                            />
-                            <Button
-                                content="Submit"
-                                submit={true}
-                                className="w-1/5 text-xl font-kanit h-full !py-3 !bg-main-green !text-black"
-                            />
-                        </form>
-                    )}
+                    <form onSubmit={handleSubmit} className="w-full">
+                        <input
+                            type="text"
+                            className="px-5 py-3 focus:outline-none border-2 border-main-green bg-transparent text-offwhite w-4/5 text-xl font-kanit disabled:border-gray-600 disabled:text-offwhite"
+                            placeholder="Enter answer here"
+                            value={answer}
+                            onChange={(e) => setAnswer(e.target.value)}
+                            disabled={correct}
+                        />
+                        <Button
+                            content="Submit"
+                            submit={true}
+                            className="w-1/5 text-xl font-kanit h-full !py-3 !bg-main-green !text-black disabled:border-gray-600 disabled:!text-offwhite disabled:!bg-gray-600"
+                            disabled={correct}
+                        />
+                    </form>
+                </div>
+                <div className=" border-[1px] border-gray-500 w-1/5 h-[64%]">
+                    <p className="text-2xl text-offwhite">SCOREBOARD</p>
+                    <p className="text-xl text-red-700">
+                        {userStore.username}: {score}
+                    </p>
                 </div>
             </div>
         </BlackBackground>
