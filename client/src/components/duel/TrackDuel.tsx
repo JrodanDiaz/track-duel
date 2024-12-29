@@ -101,18 +101,20 @@ export default function TrackDuel() {
                             reverse={i % 2 !== 0}
                         />
                     ))}
-                    <button
-                        onClick={() => selectNextSong()}
-                        className="text-xl text-offwhite"
-                    >
-                        Select Next Song
-                    </button>
-                    <Player
-                        accessToken={getSpotifyToken()}
-                        trackUri={randomTracks?.[currentTrackIndex].uri}
-                        play={play}
-                        setPlay={setPlay}
-                    />
+                    <div className=" flex flex-col gap-3 py-2">
+                        <Button
+                            onClick={() => selectNextSong()}
+                            className="text-md text-offwhite border-offwhite"
+                            content="Select Next Song"
+                        />
+
+                        <Player
+                            accessToken={getSpotifyToken()}
+                            trackUri={randomTracks?.[currentTrackIndex].uri}
+                            play={play}
+                            setPlay={setPlay}
+                        />
+                    </div>
                 </div>
 
                 <div className="w-2/5 h-4/5">
