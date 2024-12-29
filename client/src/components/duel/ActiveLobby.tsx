@@ -126,7 +126,7 @@ export default function ActiveLobby() {
                                         {isSuccess && (
                                             <Button
                                                 content="Start Duel"
-                                                className="text-4xl px-6 py-3 font-bebas border-red-600 tracking-wide  text-red-600 hover:bg-red-600 hover:text-black "
+                                                className="text-4xl px-6 w-full py-3 font-bebas border-red-600 tracking-wide  text-red-600 hover:bg-red-600 hover:text-black "
                                                 onClick={() => socket.startDuel()}
                                             />
                                         )}
@@ -185,10 +185,17 @@ export default function ActiveLobby() {
                                         )}
                                     </div>
                                     {confirmedPlaylistUri ? (
-                                        <LockedPlaylist
-                                            uri={confirmedPlaylistUri}
-                                            imageSize={300}
-                                        />
+                                        <>
+                                            <LockedPlaylist
+                                                uri={confirmedPlaylistUri}
+                                                imageSize={300}
+                                            />
+                                            <img
+                                                src="/skullfire.png"
+                                                height={200}
+                                                width={200}
+                                            />
+                                        </>
                                     ) : (
                                         <img src="/payday-gang.gif" />
                                     )}

@@ -20,7 +20,7 @@ export default function InactiveLobby() {
 
     const handleJoinRoomSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        socket.joinRoom(joinCode);
+        socket.joinRoom(joinCode.toUpperCase());
     };
 
     const handleCreateRoomClick = () => {
@@ -42,7 +42,7 @@ export default function InactiveLobby() {
             </h1>
             <img src="/matrix.png" width={300} height={300} />
             <div
-                className={`flex w-1/4 ${
+                className={`flex w-1/3 ${
                     socket.lobby.length > 0 ? "justify-center" : "justify-between"
                 }`}
             >
@@ -50,7 +50,7 @@ export default function InactiveLobby() {
                     <>
                         <Button
                             content="Create Room"
-                            className="border-red-600 text-red-600 transition-all duration-200 hover:text-black hover:bg-red-600 text-2xl rounded-full font-kanit"
+                            className="border-red-600 text-red-600 transition-all duration-200 hover:text-black hover:bg-red-600 text-4xl rounded-full font-kanit w-3/5 py-5"
                             onClick={() => {
                                 setLobbyChoice(LobbyChoice.Create);
                                 handleCreateRoomClick();
@@ -58,7 +58,7 @@ export default function InactiveLobby() {
                         />
                         <Button
                             content="Join Room"
-                            className=" !border-blue-600 !text-blue-600 transition-all duration-200 hover:!text-black hover:bg-blue-600 text-2xl rounded-full font-kanit"
+                            className=" !border-blue-600 !text-blue-600 transition-all duration-200 hover:!text-black hover:bg-blue-600 text-4xl rounded-full font-kanit w-3/5 py-5"
                             onClick={() => setLobbyChoice(LobbyChoice.Join)}
                         />
                     </>
@@ -82,14 +82,14 @@ export default function InactiveLobby() {
                     <div>
                         <Input
                             placeholder="Enter Room Code"
-                            value={joinCode}
+                            value={joinCode.toUpperCase()}
                             onChange={setJoinCode}
-                            className="!border-blue-600 border-r-transparent font-kanit"
+                            className="!border-blue-600 border-r-transparent font-kanit text-2xl h-full"
                         />
                         <Button
                             content="JOIN"
                             submit={true}
-                            className="rounded-sm border-transparent !bg-blue-600 text-offwhite px-8 font-kanit"
+                            className=" !bg-blue-600 border-transparent text-offwhite text-2xl px-8 font-kanit h-full"
                         />
                     </div>
                 </form>
