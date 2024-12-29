@@ -10,7 +10,7 @@ export default function Lobby() {
 
     return (
         <BlackBackground>
-            <Navbar />
+            <Navbar enableRoomcode={true} />
             {socket.roomCode ? <ActiveLobby /> : <InactiveLobby />}
         </BlackBackground>
     );

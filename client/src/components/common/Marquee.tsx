@@ -6,12 +6,14 @@ interface Props {
 export default function Marquee({ content, className = "", reverse = false }: Props) {
     return (
         <>
-            <div
-                className={`w-full overflow-hidden whitespace-nowrap animate-marquee ${
-                    reverse ? "animate-marquee" : "animate-reverseMarquee"
-                } ${className}`}
-            >
-                {content}
+            <div className={`w-full overflow-hidden whitespace-nowrap  ${className}`}>
+                <div
+                    className={`w-full whitespace-nowrap font-bebas ${
+                        reverse ? "animate-marquee" : "animate-reverseMarquee"
+                    }`}
+                >
+                    {content}
+                </div>
             </div>
         </>
     );

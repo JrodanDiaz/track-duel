@@ -18,7 +18,6 @@ export default function TrackDuel() {
     const navigate = useNavigate();
     const [play, setPlay] = useState<boolean>(false);
     const [startTime, setStartTime] = useState<number>(0);
-    const [elapsedTime, setElapsedTime] = useState<number>(0);
     const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
@@ -52,9 +51,10 @@ export default function TrackDuel() {
         if (isCorrectAnswer(answer)) {
             setCorrect(true);
             setPlay(false);
-            const elapsedTime = Date.now() - startTime;
-            setElapsedTime(elapsedTime);
-            setScore((prevScore) => prevScore + 100 - Math.round(elapsedTime / 1000));
+            const elapsedTimeSeconds = Math.round((Date.now() - startTime) / 1000);
+            if (elapsedTimeSeconds < 100) {
+                setScore((prev) => prev + (100 - elapsedTimeSeconds));
+            }
         } else {
             socket.sendAnswer(answer);
         }
@@ -63,11 +63,11 @@ export default function TrackDuel() {
     const selectNextSong = () => {
         if (currentTrackIndex >= randomTracks.length - 1) return;
         setAnswer("");
-        socket.resetAnswers();
+        // socket.resetAnswers();
         setCurrentTrackIndex((prev) => prev + 1);
         setCorrect(false);
         setPlay(true);
-        setStartTime(0);
+        setStartTime(Date.now());
     };
 
     const scrollToBottom = () => {
@@ -92,13 +92,13 @@ export default function TrackDuel() {
                 )}
                 <div className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500">
                     <img src={playlist.images[0].url} height={150} width={150} />
-                    {Array.from({ length: 6 }).map((_, i) => (
+                    {Array.from({ length: 8 }).map((_, i) => (
                         <Marquee
                             content={playlist.name}
-                            className={`text-xl ${
-                                i % 2 === 0 ? "text-offwhite" : "text-surface75"
+                            className={`text-2xl tracking-wider ${
+                                i % 2 === 0 ? "text-offwhite " : " !bg-white !text-black"
                             }`}
-                            reverse={i % 2 === 0}
+                            reverse={i % 2 !== 0}
                         />
                     ))}
                     <button
