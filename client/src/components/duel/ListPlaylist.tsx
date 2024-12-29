@@ -65,6 +65,12 @@ export default function ListPlaylist({
             </div>
             {selectedPlaylistUri === uri && !fetchPlaylistSuccess && handleLockIn && (
                 <>
+                    <img
+                        src="/dance.gif"
+                        height={110}
+                        width={110}
+                        className=" animate-oscillate"
+                    />
                     <button
                         onClick={() => handleLockIn()}
                         className=" px-3 py-5 border-2 border-black  text-black font-bold transition-colors hover:text-main-black hover:bg-offwhite"

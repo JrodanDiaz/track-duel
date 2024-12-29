@@ -32,10 +32,18 @@ const config: Config = {
           "0%": {transform: "translateX(100%)"},
           "100%": {transform: "translateX(-100%)"}
 
+        },
+        "oscillate-keyframe": {
+          "0%": {
+            transform: "translateX(-90px)"
+          },
+          "50%": {transform: "translateX(90px)"},
+          "100%": {transform: "translateX(-90px)"}
         }
       },
       animation: {
-        scroll: 'scroll 15s linear infinite'
+        scroll: 'scroll 15s linear infinite',
+        oscillate: 'oscillate-keyframe 3s linear infinite'
       },
       fontFamily: {
         "bebas": ["Bebas Neue, sans-serif"],

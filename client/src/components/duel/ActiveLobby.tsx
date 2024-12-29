@@ -9,16 +9,13 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import { updatePlaylist } from "../../store/state/playlistState";
 import { getRandomPlaylistIndexes, getSongsFromIndexes } from "../../utils";
 import { updateTracks } from "../../store/state/trackSelectionState";
-import Playlist from "../common/Playlist";
 import PlaylistSelection from "../common/PlaylistsSelection";
 import PlayersContainer from "./PlayersContainer";
+import LockedPlaylist from "./LockedPlaylist";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
     const dispatch = useAppDispatch();
-    const [clipboardSuccess, setClipboardSuccess] = useState<boolean | undefined>(
-        undefined
-    );
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);
@@ -45,16 +42,6 @@ export default function ActiveLobby() {
         if (!selectedPlaylistUri)
             throw new Error("Cannot Lock In On Undefined Playlist!");
         setConfirmedPlaylistUri(selectedPlaylistUri);
-    };
-
-    const handleClipboard = async () => {
-        try {
-            await navigator.clipboard.writeText(socket.roomCode);
-            setClipboardSuccess(true);
-        } catch (err) {
-            setClipboardSuccess(false);
-            console.error(err);
-        }
     };
 
     useEffect(() => {
@@ -88,7 +75,6 @@ export default function ActiveLobby() {
                 return;
             }
             dispatch(updatePlaylist(playlistData));
-            // const randomSelection = getRandomSongSelection(playlistData);
             const playlistIndexes = getRandomPlaylistIndexes(
                 playlistData.tracks.items.length
             );
@@ -115,18 +101,13 @@ export default function ActiveLobby() {
     return (
         <>
             <div className="flex flex-col items-center justify-center">
-                {clipboardSuccess === true && (
-                    <p className="text-main-green mt-4">
-                        Successfully copied to clipboard
-                    </p>
-                )}
                 <Button
                     content="Leave Room"
                     className="text-2xl rounded-sm text-red-600 border-red-600 transition-colors hover:bg-red-600 hover:text-black"
                     onClick={handleLeaveRoom}
                 />
-                <div className="w-full h-screen overflow-hidden p-4 border-[1px] border-gray-600 flex justify-between">
-                    <div className="border-[1px] w-2/5 w-3/5 border-blue-600 text-offwhite overflow-scroll">
+                <div className="w-full h-screen overflow-hidden p-4 flex justify-between">
+                    <div className="w-3/5 text-offwhite overflow-scroll">
                         {socket.isHost && (
                             <>
                                 <PlaylistSelection
@@ -147,24 +128,37 @@ export default function ActiveLobby() {
                                             ? getSavedPlaylistsError
                                             : "+  +  +  Load More Playlists  +  +  +"
                                     }
-                                    className="h-[125px] w-full text-2xl font-kanit tracking-wide"
+                                    className="h-[110px] w-full text-2xl font-kanit tracking-wide"
                                     onClick={() => incrementOffset()}
                                     disabled={getSavedPlaylistsError.length > 0}
                                 />
                             </>
                         )}
-                        {!socket.isHost && confirmedPlaylistUri && (
+                        {!socket.isHost && (
                             <>
-                                <p className="text-6xl text-offwhite font-bebas">
-                                    Playlist Locked In
-                                </p>
-                                <Playlist uri={confirmedPlaylistUri} imageSize={225} />
+                                <div className="flex flex-col gap-12 border-[1px] border-offwhite/60 min-h-screen overflow-y-hidden items-center">
+                                    <div>
+                                        <h1 className="text-5xl text-offwhite font-kanit">
+                                            {confirmedPlaylistUri
+                                                ? "Playlist Locked In"
+                                                : "Waiting for Host to Lock In Playlist..."}
+                                        </h1>
+                                        {confirmedPlaylistUri && (
+                                            <p className=" text-surface75 text-xl text-center">
+                                                Waiting for host...
+                                            </p>
+                                        )}
+                                    </div>
+                                    {confirmedPlaylistUri ? (
+                                        <LockedPlaylist
+                                            uri={confirmedPlaylistUri}
+                                            imageSize={300}
+                                        />
+                                    ) : (
+                                        <img src="/payday-gang.gif" />
+                                    )}
+                                </div>
                             </>
-                        )}
-                        {socket.playlistIndexes.length > 0 && (
-                            <p className="text-2xl text-orangey">
-                                {JSON.stringify(socket.playlistIndexes)}
-                            </p>
                         )}
                         {isSuccess && socket.isHost && (
                             <Button
@@ -174,10 +168,7 @@ export default function ActiveLobby() {
                             />
                         )}
                     </div>
-                    {/* <div className="border-[1px] border-orangey">
-                        <p className="text-xl text-offwhite">what the hell</p>
-                    </div> */}
-                    <div className="border-[1px] w-1/5 w-2/5 border-red-700 text-offwhite">
+                    <div className="border-[1px] w-1/5 w-2/5 border-offwhite/60 text-offwhite">
                         <header className="text-2xl text-offwhite font-semibold font-kanit text-center">
                             Connected Gooners
                         </header>
