@@ -12,10 +12,12 @@ import { updateTracks } from "../../store/state/trackSelectionState";
 import PlaylistSelection from "../common/PlaylistsSelection";
 import PlayersContainer from "./PlayersContainer";
 import LockedPlaylist from "./LockedPlaylist";
+import { useLocation } from "react-router-dom";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
     const dispatch = useAppDispatch();
+    const location = useLocation();
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);
@@ -98,6 +100,7 @@ export default function ActiveLobby() {
     useEffect(() => {
         setConfirmedPlaylistUri(socket.playlistUri);
     }, [socket.playlistUri]);
+
     return (
         <>
             <div className="flex flex-col items-center justify-center">
@@ -106,46 +109,78 @@ export default function ActiveLobby() {
                     className="text-2xl rounded-sm text-red-600 border-red-600 transition-colors hover:bg-red-600 hover:text-black"
                     onClick={handleLeaveRoom}
                 />
-                <div className="w-full h-screen overflow-hidden p-4 flex justify-between">
-                    <div className="w-3/5 text-offwhite overflow-scroll">
+                <div className="w-full h-screen overflow-hidden p-4 flex justify-center">
+                    <div className="w-2/5 text-offwhite overflow-scroll">
                         {socket.isHost && (
                             <>
-                                <PlaylistSelection
-                                    className="flex flex-col overflow-scroll"
-                                    uris={
-                                        savedPlaylists.length > 0
-                                            ? [...test_uris, ...savedPlaylists]
-                                            : test_uris
-                                    }
-                                    setPlaylistUri={setSelectedPlaylistUri}
-                                    selectedPlaylistUri={selectedPlaylistUri}
-                                    fetchPlaylistSuccess={isSuccess}
-                                    handleLockIn={handleLockInPlaylist}
-                                />
-                                <Button
-                                    content={
-                                        getSavedPlaylistsError
-                                            ? getSavedPlaylistsError
-                                            : "+  +  +  Load More Playlists  +  +  +"
-                                    }
-                                    className="h-[110px] w-full text-2xl font-kanit tracking-wide"
-                                    onClick={() => incrementOffset()}
-                                    disabled={getSavedPlaylistsError.length > 0}
-                                />
+                                {confirmedPlaylistUri ? (
+                                    <div className="border-[1px] border-offwhite/50 h-full flex flex-col items-center gap-6 p-4">
+                                        <p className="text-5xl font-kanit text-main-green">
+                                            Playlist Locked In...
+                                        </p>
+
+                                        <LockedPlaylist
+                                            uri={confirmedPlaylistUri}
+                                            imageSize={300}
+                                        />
+                                        {isSuccess && (
+                                            <Button
+                                                content="Start Duel"
+                                                className="text-4xl px-6 py-3 font-bebas border-red-600 tracking-wide  text-red-600 hover:bg-red-600 hover:text-black "
+                                                onClick={() => socket.startDuel()}
+                                            />
+                                        )}
+                                        <img
+                                            src="/skullfire.png"
+                                            height={200}
+                                            width={200}
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <PlaylistSelection
+                                            className="flex flex-col overflow-scroll"
+                                            uris={
+                                                savedPlaylists.length > 0
+                                                    ? [...test_uris, ...savedPlaylists]
+                                                    : test_uris
+                                            }
+                                            setPlaylistUri={setSelectedPlaylistUri}
+                                            selectedPlaylistUri={selectedPlaylistUri}
+                                            fetchPlaylistSuccess={isSuccess}
+                                            handleLockIn={handleLockInPlaylist}
+                                        />
+                                        <Button
+                                            content={
+                                                getSavedPlaylistsError
+                                                    ? getSavedPlaylistsError
+                                                    : "+  +  +  Load More Playlists  +  +  +"
+                                            }
+                                            className="h-[110px] w-full text-2xl font-kanit tracking-wide transition-colors hover:bg-main-green hover:text-black"
+                                            onClick={() => incrementOffset()}
+                                            disabled={getSavedPlaylistsError.length > 0}
+                                        />
+                                    </>
+                                )}
                             </>
                         )}
                         {!socket.isHost && (
                             <>
-                                <div className="flex flex-col gap-12 border-[1px] border-offwhite/60 min-h-screen overflow-y-hidden items-center">
+                                <div className="flex flex-col gap-12 border-[1px] border-offwhite/50 p-4 min-h-screen overflow-y-hidden items-center">
                                     <div>
-                                        <h1 className="text-5xl text-offwhite font-kanit">
-                                            {confirmedPlaylistUri
-                                                ? "Playlist Locked In"
-                                                : "Waiting for Host to Lock In Playlist..."}
+                                        <h1 className="text-5xl text-main-green font-kanit text-center">
+                                            {confirmedPlaylistUri ? (
+                                                "Playlist Locked In"
+                                            ) : (
+                                                <span className="!text-offwhite">
+                                                    Waiting for Host to Lock In
+                                                    Playlist...
+                                                </span>
+                                            )}
                                         </h1>
                                         {confirmedPlaylistUri && (
                                             <p className=" text-surface75 text-xl text-center">
-                                                Waiting for host...
+                                                Waiting for host to start...
                                             </p>
                                         )}
                                     </div>
@@ -159,13 +194,6 @@ export default function ActiveLobby() {
                                     )}
                                 </div>
                             </>
-                        )}
-                        {isSuccess && socket.isHost && (
-                            <Button
-                                content="Start Duel"
-                                className="text-2xl text-red-700 border-red-700"
-                                onClick={() => socket.startDuel()}
-                            />
                         )}
                     </div>
                     <div className="border-[1px] w-1/5 w-2/5 border-offwhite/60 text-offwhite">
