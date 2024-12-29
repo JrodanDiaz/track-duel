@@ -14,7 +14,7 @@ export default function Button({
 }: Props) {
     return (
         <button
-            className={`bg-transparent border-2 border-main-green text-main-green px-5 py-2 ${className} disabled:border-gray-500 disabled:text-gray-500`}
+            className={`bg-transparent border-2 border-main-green text-main-green px-5 py-2 ${className} disabled:border-gray-500 disabled:text-gray-500 disabled:bg-transparent`}
             type={submit ? "submit" : "button"}
             onClick={onClick}
             disabled={disabled}

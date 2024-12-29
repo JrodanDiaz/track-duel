@@ -27,10 +27,36 @@ const config: Config = {
         "surface25": "#42433d"
 
       },
+      keyframes: {
+        "scroll": {
+          "0%": {transform: "translateX(100%)"},
+          "100%": {transform: "translateX(-100%)"}
+
+        },
+        "marquee-keyframe": {
+          "0%": {transform: "translateX(-100%)"},
+          "100%": {transform: "translateX(100%)"}
+        },
+        "oscillate-keyframe": {
+          "0%": {
+            transform: "translateX(-90px)"
+          },
+          "50%": {transform: "translateX(90px)"},
+          "100%": {transform: "translateX(-90px)"}
+        }
+      },
+      animation: {
+        scroll: 'scroll 15s linear infinite',
+        oscillate: 'oscillate-keyframe 3s linear infinite',
+        marquee: 'marquee-keyframe 6s linear infinite',
+        reverseMarquee: 'scroll 6s linear infinite'
+      
+      },
       fontFamily: {
         "bebas": ["Bebas Neue, sans-serif"],
         "protest": ["Protest Strike, sans-serif"],
-        "kanit": ["Kanit, sans-serif"]
+        "kanit": ["Kanit, sans-serif"],
+        "lato": ["Lato, sans-serif"]
       }
     },
   },

@@ -101,13 +101,18 @@ export default function useWebsocketSetup() {
             default:
                 console.log("Default in SocketResponse Switch. How did we get here...");
                 console.log(`${JSON.stringify(parsedMessage.data)}`);
+                console.log("Resetting RoomCode and StartSignal");
+                setRoomCode("");
+                setStartSignal(false);
         }
     };
 
     useEffect(() => {
         console.log("Running Websocket Setup..");
         if (!user.username) {
-            throw new Error("Username undefined while establishing connection...");
+            // throw new Error("Username undefined while establishing connection...");
+            console.log(`Aborted Websocket Connection, Username is undefined...`);
+            return;
         }
 
         const url = `ws://localhost:3000?user=${user.username}`;
@@ -122,13 +127,16 @@ export default function useWebsocketSetup() {
 
         socketRef.current.onclose = () => {
             console.log("Websocket connection closed..");
+            setLobby([]);
+            setRoomCode("");
+            setStartSignal(false);
         };
 
         return () => {
             console.log("Cleaning up Websocket connection..");
             socketRef.current?.close();
         };
-    }, []);
+    }, [user]);
 
     return {
         loading,
@@ -166,6 +174,9 @@ export default function useWebsocketSetup() {
             );
         },
         leaveRoom: () => {
+            setPlaylistIndexes([]);
+            setPlaylistUri("");
+            setLobby([]);
             socketRef.current?.send(
                 JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
             );
