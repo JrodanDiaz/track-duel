@@ -1,9 +1,7 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { setSpotifyToken, handleSpotifyRedirect } from "../../api/spotify";
-import useAppDispatch from "../../hooks/useAppDispatch";
 import useUser from "../../hooks/useUser";
-import { authenticateSpotify } from "../../store/state/userState";
 import { User } from "../../types";
 import useAuthCheck from "../auth/AuthCheck";
 import BlackBackground from "../common/BlackBackground";
@@ -14,18 +12,15 @@ import AlbumScroll from "./AlbumScroll";
 export default function Root() {
     useAuthCheck();
     const user = useUser();
-    const dispatch = useAppDispatch();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, _] = useSearchParams();
 
     useEffect(() => {
         const spotifyToken = searchParams.get("token");
         if (spotifyToken) {
             setSpotifyToken(spotifyToken);
-            dispatch(authenticateSpotify(spotifyToken));
-            setSearchParams("");
+            window.location.href = "/";
         }
     }, []);
-
 
     const loggedInNoSpotify = (user: User) => {
         return user.username && user.authToken && !user.spotifyToken;
