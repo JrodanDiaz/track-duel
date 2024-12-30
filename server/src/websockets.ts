@@ -1,7 +1,6 @@
 import { IncomingMessage, Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import { rooms, userRoomMap } from "./handlers/roomHandler";
-import { Socket } from "dgram";
 
 enum SocketRequest {
     JoinRoom = "join-room",
@@ -35,6 +34,11 @@ const getUserFromRequest = (req: IncomingMessage) => {
     return url.searchParams.get("user");
 };
 
+export const deleteRoom = (roomCode: string) => {
+    clearRoomInterval(roomCode)
+    delete rooms[roomCode]
+}
+
 const sendMessageToRoom = (roomCode: string, message: Object) => {
     if (!rooms[roomCode]) {
         console.error("Error: Attempted to send message to nonexistant room");
@@ -58,7 +62,7 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
         console.log(`Removed ${user} from room ${roomCode}`);
 
         if (rooms[roomCode].users.size === 0) {
-            delete rooms[roomCode];
+            deleteRoom(roomCode)
             console.log(`Deleted empty room ${roomCode}`);
         } else {
             const room = getUsersFromRoom(roomCode);
@@ -71,11 +75,17 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
     }
 };
 
-const setContinueSignalTimer = (timeSeconds: number, roomCode: string) => {
-    setTimeout(() => {
+const setContinueInterval = (roomCode: string, timeSeconds: number) => {
+    const interval_id = setInterval(() => {
         sendMessageToRoom(roomCode, { type: SocketResponse.Continue });
-    }, timeSeconds * 1000);
-};
+    }, timeSeconds * 1000)
+    rooms[roomCode].interval_id = interval_id
+}
+
+export const clearRoomInterval = (roomCode: string) => {
+    const interval_id = rooms[roomCode].interval_id
+    if(interval_id) clearInterval(interval_id)
+}
 
 export const configureWebsocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
@@ -127,7 +137,7 @@ export const configureWebsocketServer = (server: Server) => {
             } 
             else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
                 sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel});
-                setContinueSignalTimer(10, parsedMessage.roomCode);
+                setContinueInterval(parsedMessage.roomCode, 15)
             } 
             else if (parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
                 removeUserFromRoom(roomCode, ws);

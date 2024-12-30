@@ -53,7 +53,6 @@ export default function TrackDuel() {
 
         setTimeout(() => {
             setSongBreak(false);
-            // setCurrentTrackIndex((prev) => prev + 1);
             selectNextSong();
         }, 5000);
     }, [socket.continueSignal]);

@@ -120,7 +120,6 @@ export default function useWebsocketSetup() {
             default:
                 console.log("Default in SocketResponse Switch. How did we get here...");
                 console.log(`${JSON.stringify(parsedMessage.data)}`);
-                console.log("Resetting RoomCode and StartSignal");
                 setRoomCode("");
                 setStartSignal(false);
         }
