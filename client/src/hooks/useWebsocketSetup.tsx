@@ -39,7 +39,6 @@ export default function useWebsocketSetup() {
     const [isHost, setIsHost] = useState(false);
     const [playlistUri, setPlaylistUri] = useState("");
     const [playlistIndexes, setPlaylistIndexes] = useState<number[]>([]);
-    const dispatch = useAppDispatch();
 
     const handleMessage = (message: MessageEvent) => {
         const parsedMessage = socketResponseSchema.safeParse(JSON.parse(message.data));

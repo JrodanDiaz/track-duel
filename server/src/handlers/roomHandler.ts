@@ -12,12 +12,15 @@ type DuelRooms = {
     [roomCode: string]: DuelRoom
 }
 
-type UserRoomMap = {
-  [username: string]: string
+type UserMap = {
+  [username: string]: {
+    roomCode: string,
+    answered_correctly: boolean
+  }
 }
 
 export const rooms: DuelRooms = {}
-export const userRoomMap: UserRoomMap = {}
+export const userMap: UserMap = {}
 
 const generateRoomCode = (length = 6) => {
     let code = ""
@@ -37,15 +40,15 @@ export const generateRoomHandler = async (req: Request, res: Response) => {
   
 
   //if this user already has a generated room, delete it before adding new one
-  if(userRoomMap[user]) {
-    const roomCode = userRoomMap[user]
+  if(userMap[user]?.roomCode) {
+    const roomCode = userMap[user].roomCode
     deleteRoom(roomCode)
   }
 
 
     const roomCode = generateRoomCode();
     rooms[roomCode] = { users: new Set(), interval_id: null };
-    userRoomMap[user] = roomCode
+    userMap[user] = {roomCode: roomCode, answered_correctly: false}
     console.log(`Rooms: ${JSON.stringify(rooms)}`);
     
     res.status(200).json({ roomCode: roomCode });

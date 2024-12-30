@@ -1,6 +1,6 @@
 import { IncomingMessage, Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
-import { rooms, userRoomMap } from "./handlers/roomHandler";
+import { rooms, userMap } from "./handlers/roomHandler";
 
 enum SocketRequest {
     JoinRoom = "join-room",
@@ -69,14 +69,33 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
             sendMessageToRoom(roomCode, { type: "room-update", room: room });
         }
     }
-    if (userRoomMap[user]) {
-        delete userRoomMap[user];
-        console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
+    if (userMap[user]) {
+        delete userMap[user];
+        console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userMap)}`);
     }
 };
 
+const resetLobbyCorrectAnswerFlags = (roomCode: string) => {
+        const users = rooms[roomCode].users
+        users.forEach(socket => {
+            const username = userSocketMap.get(socket)
+            if(username) {
+                userMap[username].answered_correctly = false
+            }
+        })
+}
+
+const entireLobbyAnsweredCorrectly = (roomCode: string) => {
+    for(const socket of rooms[roomCode].users) {
+        const username = userSocketMap.get(socket)
+        if(username && !userMap[username]?.answered_correctly) return false
+    }
+    return true
+}
+
 const setContinueInterval = (roomCode: string, timeSeconds: number) => {
     const interval_id = setInterval(() => {
+        resetLobbyCorrectAnswerFlags(roomCode)
         sendMessageToRoom(roomCode, { type: SocketResponse.Continue });
     }, timeSeconds * 1000)
     rooms[roomCode].interval_id = interval_id
@@ -104,6 +123,9 @@ export const configureWebsocketServer = (server: Server) => {
             return;
         }
         userSocketMap.set(ws, user);
+        if(!userMap[user]) {
+            userMap[user] = {roomCode: "", answered_correctly: false}
+        }
 
         ws.on("error", onSocketPostError);
 
@@ -137,7 +159,7 @@ export const configureWebsocketServer = (server: Server) => {
             } 
             else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
                 sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel});
-                setContinueInterval(parsedMessage.roomCode, 15)
+                setContinueInterval(parsedMessage.roomCode, 30)
             } 
             else if (parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
                 removeUserFromRoom(roomCode, ws);
@@ -163,6 +185,15 @@ export const configureWebsocketServer = (server: Server) => {
                     type: SocketResponse.Correct,
                     username: user,
                 });
+                userMap[user].answered_correctly = true
+                if(rooms[roomCode].users.size > 1 && entireLobbyAnsweredCorrectly(roomCode))
+                {
+                    resetLobbyCorrectAnswerFlags(roomCode)
+                    clearRoomInterval(roomCode)
+                    sendMessageToRoom(roomCode, {type: SocketResponse.Continue})
+                    setContinueInterval(roomCode, 30)
+                }
+
             } 
             else {
                 wss.clients.forEach((client) => {
