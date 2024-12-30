@@ -9,7 +9,7 @@ enum SocketRequest {
     StartDuel = "start-duel",
     SendPlaylist = "send-playlist",
     Answer = "answer",
-    Correct = "correct"
+    Correct = "correct",
 }
 
 enum SocketResponse {
@@ -20,14 +20,14 @@ enum SocketResponse {
     LeftRoom = "left-room",
     Playlist = "playlist",
     Correct = "correct",
-    Continue = "continue"
+    Continue = "continue",
 }
 
 const userSocketMap = new Map<WebSocket, string>();
 
 const sendMessage = (ws: WebSocket, message: Object) => {
-    ws.send(JSON.stringify(message))
-}
+    ws.send(JSON.stringify(message));
+};
 
 const getUserFromRequest = (req: IncomingMessage) => {
     const path = "http://localhost:3000";
@@ -36,10 +36,10 @@ const getUserFromRequest = (req: IncomingMessage) => {
 };
 
 const sendMessageToRoom = (roomCode: string, message: Object) => {
-    if(!rooms[roomCode]) {
-        console.error("Error: Attempted to send message to nonexistant room")
-        return
-    } 
+    if (!rooms[roomCode]) {
+        console.error("Error: Attempted to send message to nonexistant room");
+        return;
+    }
     rooms[roomCode].users.forEach((socket) => {
         socket.send(JSON.stringify(message));
     });
@@ -50,10 +50,10 @@ const getUsersFromRoom = (roomCode: string) => {
 };
 
 const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
-    const user = userSocketMap.get(socket)
-    if(!user) throw new Error("Error: Cannot remove user that is absent from UserSocketMap")
+    const user = userSocketMap.get(socket);
+    if (!user)
+        throw new Error("Error: Cannot remove user that is absent from UserSocketMap");
     if (rooms[roomCode]) {
-
         rooms[roomCode].users.delete(socket);
         console.log(`Removed ${user} from room ${roomCode}`);
 
@@ -69,14 +69,13 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
         delete userRoomMap[user];
         console.log(`Deleted user's UserRoomMap: ${JSON.stringify(userRoomMap)}`);
     }
-
-}
+};
 
 const setContinueSignalTimer = (timeSeconds: number, roomCode: string) => {
     setTimeout(() => {
-        sendMessageToRoom(roomCode, {type: SocketResponse.Continue})
-    }, timeSeconds * 1000)
-}
+        sendMessageToRoom(roomCode, { type: SocketResponse.Continue });
+    }, timeSeconds * 1000);
+};
 
 export const configureWebsocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
@@ -105,39 +104,56 @@ export const configureWebsocketServer = (server: Server) => {
             if (parsedMessage.type === SocketRequest.JoinRoom && parsedMessage.roomCode) {
                 //disgusting type cast to stop TS from crying. Is Zod validation really necessary
                 roomCode = parsedMessage.roomCode as string;
-                if (rooms[roomCode]) {
-                    rooms[roomCode].users.add(ws);
-                    console.log(`User ${user} joined room ${roomCode}`);
-
-                    const lobby = getUsersFromRoom(roomCode);
-
-                    console.log(`${roomCode} Lobby: ${lobby}`);
-
-                    const isHost = rooms[roomCode].users.size === 1
-                    sendMessage(ws, {type: SocketResponse.RoomJoined, roomCode: roomCode, users: lobby, host: isHost})
-
-                    sendMessageToRoom(roomCode, { type: SocketResponse.UserJoined, user: user });
-                } else {
-                    sendMessage(ws, {type: SocketResponse.Error, message: "Room not found"})
+                if (!rooms[roomCode]) {
+                    sendMessage(ws, {type: SocketResponse.Error, message: "Room not found"});
+                    return;
                 }
-            } else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
-                sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel})
-                setContinueSignalTimer(10, parsedMessage.roomCode)
-            } else if(parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
-                removeUserFromRoom(roomCode, ws)
-                sendMessage(ws, {type: SocketResponse.LeftRoom})
+                rooms[roomCode].users.add(ws);
+                console.log(`User ${user} joined room ${roomCode}`);
+
+                const lobby = getUsersFromRoom(roomCode);
+
+                console.log(`${roomCode} Lobby: ${lobby}`);
+
+                const isHost = rooms[roomCode].users.size === 1;
+                sendMessage(ws, {
+                    type: SocketResponse.RoomJoined,
+                    roomCode: roomCode,
+                    users: lobby,
+                    host: isHost,
+                });
+
+                sendMessageToRoom(roomCode, {type: SocketResponse.UserJoined, user: user });
             } 
-            else if(parsedMessage.type === SocketRequest.SendPlaylist) {
-                if(!roomCode) {
-                    sendMessage(ws, {type: SocketResponse.Error, message: "Internal Server Error: Room Code Undefined"})
-                    return
+            else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
+                sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel});
+                setContinueSignalTimer(10, parsedMessage.roomCode);
+            } 
+            else if (parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
+                removeUserFromRoom(roomCode, ws);
+                sendMessage(ws, { type: SocketResponse.LeftRoom });
+            } 
+            else if (parsedMessage.type === SocketRequest.SendPlaylist) {
+                if (!roomCode) {
+                    sendMessage(ws, {
+                        type: SocketResponse.Error,
+                        message: "Internal Server Error: Room Code Undefined",
+                    });
+                    return;
                 }
                 //to optimize, we can probably just return parsedMessage, since we're not transforming or adding any new data. Just relaying
-                sendMessageToRoom(roomCode, {type: SocketResponse.Playlist, playlist_uri: parsedMessage.playlist_uri, playlist_indexes: parsedMessage.playlist_indexes})
-            }
-            else if(parsedMessage.type === SocketRequest.Correct && roomCode && user) {
-                sendMessageToRoom(roomCode, {type: SocketResponse.Correct, username: user})
-            }
+                sendMessageToRoom(roomCode, {
+                    type: SocketResponse.Playlist,
+                    playlist_uri: parsedMessage.playlist_uri,
+                    playlist_indexes: parsedMessage.playlist_indexes,
+                });
+            } 
+            else if (parsedMessage.type === SocketRequest.Correct && roomCode && user) {
+                sendMessageToRoom(roomCode, {
+                    type: SocketResponse.Correct,
+                    username: user,
+                });
+            } 
             else {
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
@@ -149,9 +165,9 @@ export const configureWebsocketServer = (server: Server) => {
 
         ws.on("close", () => {
             console.log("Connection closed...");
-            
-            if(roomCode) {
-                removeUserFromRoom(roomCode, ws)
+
+            if (roomCode) {
+                removeUserFromRoom(roomCode, ws);
             }
             userSocketMap.delete(ws);
             console.log(`${user} disconnected...`);

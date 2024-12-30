@@ -128,9 +128,13 @@ export default function useWebsocketSetup() {
 
     useEffect(() => {
         console.log("Running Websocket Setup..");
+        const timeout = setTimeout(() => {
+            window.location.href = "/";
+        }, 3000);
+
         if (!user.username) {
-            // throw new Error("Username undefined while establishing connection...");
             console.log(`Aborted Websocket Connection, Username is undefined...`);
+            window.location.href = "/";
             return;
         }
 
@@ -139,6 +143,7 @@ export default function useWebsocketSetup() {
 
         socketRef.current.onopen = () => {
             setLoading(false);
+            clearTimeout(timeout);
             console.log("Websocket connection established?");
         };
 
@@ -152,6 +157,7 @@ export default function useWebsocketSetup() {
         };
 
         return () => {
+            clearTimeout(timeout);
             console.log("Cleaning up Websocket connection..");
             socketRef.current?.close();
         };
