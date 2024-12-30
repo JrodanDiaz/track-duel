@@ -49,6 +49,7 @@ export default function TrackDuel() {
         e.preventDefault();
         setAnswer("");
         if (isCorrectAnswer(answer)) {
+            socket.broadcastCorrectAnswer();
             setCorrect(true);
             setPlay(false);
             const elapsedTimeSeconds = Math.round((Date.now() - startTime) / 1000);
@@ -127,15 +128,28 @@ export default function TrackDuel() {
                                 Dead chat... Someone say something
                             </p>
                         )}
-                        {socket.answers.map((answer, i) => (
-                            <p
-                                className={`${
-                                    i % 2 === 0 ? "text-offwhite " : "text-main-green"
-                                } border-b-[1px] border-b-offwhite border-spacing-1 text-xl font-lato my-2`}
-                            >
-                                <strong>{answer.from}:</strong> {answer.answer}
-                            </p>
-                        ))}
+                        {socket.answers.map((answer, i) => {
+                            const answerStyle =
+                                "border-b-[1px] border-b-offwhite border-spacing-1 text-xl font-lato my-2";
+                            if (answer.isCorrect) {
+                                return (
+                                    <p className={`text-main-green  ${answerStyle}`}>
+                                        {answer.from} guessed the song correctly!
+                                    </p>
+                                );
+                            } else
+                                return (
+                                    <p
+                                        className={`${answerStyle} ${
+                                            i % 2 === 0
+                                                ? "text-offwhite "
+                                                : " text-surface75"
+                                        }`}
+                                    >
+                                        <strong>{answer.from}:</strong> {answer.answer}
+                                    </p>
+                                );
+                        })}
                     </div>
                     <form onSubmit={handleSubmit} className="w-full">
                         <input

@@ -14,6 +14,7 @@ enum SocketResponse {
     RoomUpdate = "room-update",
     LeftRoom = "left-room",
     Playlist = "playlist",
+    Correct = "correct",
 }
 
 enum SocketRequest {
@@ -22,6 +23,7 @@ enum SocketRequest {
     StartDuel = "start-duel",
     SendPlaylist = "send-playlist",
     Answer = "answer",
+    Correct = "correct",
 }
 
 export default function useWebsocketSetup() {
@@ -97,6 +99,18 @@ export default function useWebsocketSetup() {
                 break;
             case SocketResponse.Error:
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
+                break;
+            case SocketResponse.Correct:
+                console.log(`${parsedMessage.data.user} answered correctly!`);
+                setAnswers((prev) => [
+                    ...prev,
+                    {
+                        from: parsedMessage.data.username as string,
+                        answer: "",
+                        isCorrect: true,
+                    },
+                ]);
+
                 break;
             default:
                 console.log("Default in SocketResponse Switch. How did we get here...");
@@ -189,6 +203,9 @@ export default function useWebsocketSetup() {
                     playlist_indexes: playlistIndexes,
                 })
             );
+        },
+        broadcastCorrectAnswer: () => {
+            socketRef.current?.send(JSON.stringify({ type: SocketRequest.Correct }));
         },
         lobby,
         startSignal,

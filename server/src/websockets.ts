@@ -1,13 +1,15 @@
 import { IncomingMessage, Server } from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import { rooms, userRoomMap } from "./handlers/roomHandler";
+import { Socket } from "dgram";
 
 enum SocketRequest {
     JoinRoom = "join-room",
     LeaveRoom = "leave-room",
     StartDuel = "start-duel",
     SendPlaylist = "send-playlist",
-    Answer = "answer"
+    Answer = "answer",
+    Correct = "correct"
 }
 
 enum SocketResponse {
@@ -16,7 +18,8 @@ enum SocketResponse {
     Error = "error",
     StartDuel = "start-duel",
     LeftRoom = "left-room",
-    Playlist = "playlist"
+    Playlist = "playlist",
+    Correct = "correct"
 }
 
 const userSocketMap = new Map<WebSocket, string>();
@@ -123,6 +126,9 @@ export const configureWebsocketServer = (server: Server) => {
                 }
                 //to optimize, we can probably just return parsedMessage, since we're not transforming or adding any new data. Just relaying
                 sendMessageToRoom(roomCode, {type: SocketResponse.Playlist, playlist_uri: parsedMessage.playlist_uri, playlist_indexes: parsedMessage.playlist_indexes})
+            }
+            else if(parsedMessage.type === SocketRequest.Correct && roomCode && user) {
+                sendMessageToRoom(roomCode, {type: SocketResponse.Correct, username: user})
             }
             else {
                 wss.clients.forEach((client) => {

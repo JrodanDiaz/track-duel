@@ -123,13 +123,12 @@ export default function ActiveLobby() {
                                             uri={confirmedPlaylistUri}
                                             imageSize={300}
                                         />
-                                        {isSuccess && (
-                                            <Button
-                                                content="Start Duel"
-                                                className="text-4xl px-6 w-full py-3 font-bebas border-red-600 tracking-wide  text-red-600 hover:bg-red-600 hover:text-black "
-                                                onClick={() => socket.startDuel()}
-                                            />
-                                        )}
+                                        <Button
+                                            content="Start Duel"
+                                            className="text-4xl px-6 w-full py-3 font-bebas border-red-600 tracking-wide  text-red-600 hover:bg-red-600 hover:text-black "
+                                            onClick={() => socket.startDuel()}
+                                            disabled={isLoading}
+                                        />
                                         <img
                                             src="/skullfire.png"
                                             height={200}

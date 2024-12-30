@@ -38,5 +38,6 @@ export type PlaylistQuery = {
 export type Answer = {
   from: string,
   answer: string
+  isCorrect?: boolean
 }
 
