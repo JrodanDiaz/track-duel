@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import useUser from "../hooks/useUser";
-import useAppDispatch from "../hooks/useAppDispatch";
 import { socketResponseSchema } from "../schemas";
 import { Answer } from "../types";
 
@@ -16,6 +15,7 @@ enum SocketResponse {
     Playlist = "playlist",
     Correct = "correct",
     Continue = "continue",
+    UserDisconnected = "user-disconnected",
 }
 
 enum SocketRequest {
@@ -27,12 +27,16 @@ enum SocketRequest {
     Correct = "correct",
 }
 
+type Lobby = {
+    [username: string]: { score: number };
+};
+
 export default function useWebsocketSetup() {
     const socketRef = useRef<WebSocket | null>(null);
     const user = useUser();
     const [loading, setLoading] = useState(true);
     const [answers, setAnswers] = useState<Answer[]>([]);
-    const [lobby, setLobby] = useState<string[]>([]);
+    const [lobby, setLobby] = useState<Lobby>({});
     const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
     const [continueSignal, setContinueSignal] = useState<number>(0);
@@ -65,32 +69,36 @@ export default function useWebsocketSetup() {
                 break;
             case SocketResponse.RoomJoined:
                 console.log(`Successfully connected to room`);
-                console.log(`Lobby: ${parsedMessage.data.users}`);
-                setLobby(parsedMessage.data.users as string[]);
+                const players = parsedMessage.data.users as string[];
+                const newPlayers: Lobby = {};
+                players.forEach((player) => (newPlayers[player] = { score: 0 }));
+                setLobby(newPlayers);
                 setRoomCode(parsedMessage.data.roomCode as string);
-                console.log(`isHost: ${parsedMessage.data.host}`);
-
                 setIsHost(parsedMessage.data.host as boolean);
                 break;
             case SocketResponse.UserJoined:
                 console.log(`${parsedMessage.data.user} joined the room!`);
-                setLobby((prev) => [
-                    ...new Set([...prev, parsedMessage.data.user as string]),
-                ]);
+
+                const player = parsedMessage.data.user as string;
+                if (player in lobby) return;
+                setLobby((prev) => ({ ...prev, [player]: { score: 0 } }));
                 break;
             case SocketResponse.StartDuel:
                 console.log(`Start Duel: ${parsedMessage.data.type}`);
                 setStartSignal(true);
                 break;
-            case SocketResponse.RoomUpdate:
-                console.log(`Room Update`);
-                //more evil type casting
-                setLobby(parsedMessage.data.room as string[]);
+            case SocketResponse.UserDisconnected:
+                console.log(`${parsedMessage.data.user as string} Disconnected...`);
+                setLobby((prev) => {
+                    const newLobby = { ...prev };
+                    delete newLobby[parsedMessage.data.user as string];
+                    return newLobby;
+                });
                 break;
             case SocketResponse.LeftRoom:
                 console.log("Successfully left room");
                 setRoomCode("");
-                setLobby([]);
+                setLobby({});
                 setStartSignal(false);
                 setAnswers([]);
                 break;
@@ -149,7 +157,7 @@ export default function useWebsocketSetup() {
 
         socketRef.current.onclose = () => {
             console.log("Websocket connection closed..");
-            setLobby([]);
+            setLobby({});
             setRoomCode("");
             setStartSignal(false);
         };
@@ -177,7 +185,7 @@ export default function useWebsocketSetup() {
             setAnswers([]);
         },
         joinRoom: (roomCode: string) => {
-            setLobby([]);
+            setLobby({});
             socketRef.current?.send(
                 JSON.stringify({
                     type: SocketRequest.JoinRoom,
@@ -199,7 +207,7 @@ export default function useWebsocketSetup() {
         leaveRoom: () => {
             setPlaylistIndexes([]);
             setPlaylistUri("");
-            setLobby([]);
+            setLobby({});
             socketRef.current?.send(
                 JSON.stringify({ type: SocketRequest.LeaveRoom, roomCode: roomCode })
             );

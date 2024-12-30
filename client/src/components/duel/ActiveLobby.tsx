@@ -12,12 +12,10 @@ import { updateTracks } from "../../store/state/trackSelectionState";
 import PlaylistSelection from "../common/PlaylistsSelection";
 import PlayersContainer from "./PlayersContainer";
 import LockedPlaylist from "./LockedPlaylist";
-import { useLocation } from "react-router-dom";
 
 export default function ActiveLobby() {
     const socket = useContext(WebsocketContext);
     const dispatch = useAppDispatch();
-    const location = useLocation();
     const [getSavedPlaylistsError, setSavedPlaylistsError] = useState("");
     const [savedPlaylists, setSavedPlaylists] = useState<string[]>([]);
     const [offset, setOffset] = useState(savedPlaylists.length);
@@ -202,11 +200,11 @@ export default function ActiveLobby() {
                             </>
                         )}
                     </div>
-                    <div className="border-[1px] w-1/5 w-2/5 border-offwhite/60 text-offwhite">
+                    <div className="border-[1px]  w-2/5 border-offwhite/60 text-offwhite">
                         <header className="text-2xl text-offwhite font-semibold font-kanit text-center">
                             Connected Gooners
                         </header>
-                        <PlayersContainer players={socket.lobby} />
+                        <PlayersContainer players={Object.keys(socket.lobby)} />
                     </div>
                 </div>
             </div>

@@ -20,6 +20,7 @@ enum SocketResponse {
     Playlist = "playlist",
     Correct = "correct",
     Continue = "continue",
+    UserDisconnected = "user-disconnected"
 }
 
 const userSocketMap = new Map<WebSocket, string>();
@@ -65,8 +66,7 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
             deleteRoom(roomCode)
             console.log(`Deleted empty room ${roomCode}`);
         } else {
-            const room = getUsersFromRoom(roomCode);
-            sendMessageToRoom(roomCode, { type: "room-update", room: room });
+            sendMessageToRoom(roomCode, { type: SocketResponse.UserDisconnected, user: user });
         }
     }
     if (userMap[user]) {
@@ -79,7 +79,7 @@ const resetLobbyCorrectAnswerFlags = (roomCode: string) => {
         const users = rooms[roomCode].users
         users.forEach(socket => {
             const username = userSocketMap.get(socket)
-            if(username) {
+            if(username && userMap[username]?.answered_correctly === true) {
                 userMap[username].answered_correctly = false
             }
         })
