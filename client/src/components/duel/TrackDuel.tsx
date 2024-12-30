@@ -19,6 +19,7 @@ export default function TrackDuel() {
     const [play, setPlay] = useState<boolean>(false);
     const [startTime, setStartTime] = useState<number>(0);
     const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
+    const [songBreak, setSongBreak] = useState(false);
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
     const [score, setScore] = useState<number>(0);
@@ -44,6 +45,18 @@ export default function TrackDuel() {
             setStartTime(Date.now());
         }
     }, [play]);
+
+    useEffect(() => {
+        if (socket.continueSignal === 0) return;
+        setSongBreak(true);
+        setPlay(false);
+
+        setTimeout(() => {
+            setSongBreak(false);
+            // setCurrentTrackIndex((prev) => prev + 1);
+            selectNextSong();
+        }, 5000);
+    }, [socket.continueSignal]);
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -173,6 +186,9 @@ export default function TrackDuel() {
                     <p className="text-xl text-red-700">
                         {userStore.username}: {score}
                     </p>
+                    {songBreak && (
+                        <p className="text-2xl text-blue-500">IN SONG BREAK STATE</p>
+                    )}
                 </div>
             </div>
         </BlackBackground>

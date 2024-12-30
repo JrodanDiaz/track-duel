@@ -15,6 +15,7 @@ enum SocketResponse {
     LeftRoom = "left-room",
     Playlist = "playlist",
     Correct = "correct",
+    Continue = "continue",
 }
 
 enum SocketRequest {
@@ -34,6 +35,7 @@ export default function useWebsocketSetup() {
     const [lobby, setLobby] = useState<string[]>([]);
     const [roomCode, setRoomCode] = useState("");
     const [startSignal, setStartSignal] = useState(false);
+    const [continueSignal, setContinueSignal] = useState<number>(0);
     const [isHost, setIsHost] = useState(false);
     const [playlistUri, setPlaylistUri] = useState("");
     const [playlistIndexes, setPlaylistIndexes] = useState<number[]>([]);
@@ -101,7 +103,6 @@ export default function useWebsocketSetup() {
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
                 break;
             case SocketResponse.Correct:
-                console.log(`${parsedMessage.data.user} answered correctly!`);
                 setAnswers((prev) => [
                     ...prev,
                     {
@@ -111,6 +112,10 @@ export default function useWebsocketSetup() {
                     },
                 ]);
 
+                break;
+            case SocketResponse.Continue:
+                console.log("Received SocketResponse: Continue");
+                setContinueSignal((prev) => prev + 1);
                 break;
             default:
                 console.log("Default in SocketResponse Switch. How did we get here...");
@@ -209,6 +214,7 @@ export default function useWebsocketSetup() {
         },
         lobby,
         startSignal,
+        continueSignal,
         roomCode,
         isHost,
         playlistUri,

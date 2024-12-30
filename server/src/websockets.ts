@@ -19,7 +19,8 @@ enum SocketResponse {
     StartDuel = "start-duel",
     LeftRoom = "left-room",
     Playlist = "playlist",
-    Correct = "correct"
+    Correct = "correct",
+    Continue = "continue"
 }
 
 const userSocketMap = new Map<WebSocket, string>();
@@ -71,6 +72,12 @@ const removeUserFromRoom = (roomCode: string, socket: WebSocket) => {
 
 }
 
+const setContinueSignalTimer = (timeSeconds: number, roomCode: string) => {
+    setTimeout(() => {
+        sendMessageToRoom(roomCode, {type: SocketResponse.Continue})
+    }, timeSeconds * 1000)
+}
+
 export const configureWebsocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
 
@@ -115,6 +122,7 @@ export const configureWebsocketServer = (server: Server) => {
                 }
             } else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
                 sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel})
+                setContinueSignalTimer(10, parsedMessage.roomCode)
             } else if(parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
                 removeUserFromRoom(roomCode, ws)
                 sendMessage(ws, {type: SocketResponse.LeftRoom})
