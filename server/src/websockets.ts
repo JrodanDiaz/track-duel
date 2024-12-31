@@ -160,6 +160,9 @@ export const configureWebsocketServer = (server: Server) => {
             else if (parsedMessage.type === SocketRequest.StartDuel && parsedMessage.roomCode) {
                 sendMessageToRoom(parsedMessage.roomCode, {type: SocketResponse.StartDuel});
                 setContinueInterval(parsedMessage.roomCode, 30)
+                setTimeout(() => {
+                    sendMessageToRoom(parsedMessage.roomCode, { type: SocketResponse.Continue });
+                }, 1500)
             } 
             else if (parsedMessage.type === SocketRequest.LeaveRoom && roomCode) {
                 removeUserFromRoom(roomCode, ws);

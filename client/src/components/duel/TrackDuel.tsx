@@ -45,14 +45,14 @@ export default function TrackDuel() {
     }, [play]);
 
     useEffect(() => {
-        if (socket.continueSignal === 0) return;
+        if (socket.continueSignal <= 0) return;
         setSongBreak(true);
         setPlay(false);
 
         setTimeout(() => {
             setSongBreak(false);
             selectNextSong();
-        }, 5000);
+        }, 4000);
     }, [socket.continueSignal]);
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -73,8 +73,10 @@ export default function TrackDuel() {
     const selectNextSong = () => {
         if (currentTrackIndex >= randomTracks.length - 1) return;
         setAnswer("");
-        setCurrentTrackIndex((prev) => prev + 1);
         setCorrect(false);
+        if (socket.continueSignal > 1) {
+            setCurrentTrackIndex((prev) => prev + 1);
+        }
         setPlay(true);
         setStartTime(Date.now());
     };
@@ -108,12 +110,6 @@ export default function TrackDuel() {
                         />
                     ))}
                     <div className=" flex flex-col gap-3 py-2">
-                        <Button
-                            onClick={() => selectNextSong()}
-                            className="text-md text-offwhite border-offwhite"
-                            content="Select Next Song"
-                        />
-
                         <Player
                             accessToken={getSpotifyToken()}
                             trackUri={randomTracks?.[currentTrackIndex].uri}
