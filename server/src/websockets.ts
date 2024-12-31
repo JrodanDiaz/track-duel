@@ -181,14 +181,13 @@ export const configureWebsocketServer = (server: Server) => {
                 });
             } 
             else if (parsedMessage.type === SocketRequest.Correct && roomCode && user) {
+                console.log(`Received Correct Request: ${JSON.stringify(parsedMessage)}`);
+                
                 if(!(user in userMap)) {
                     console.log("ERROR: CORRECT REQUEST RECEIVED FROM DISCONNECTED USER")
                     return
                 }
-                sendMessageToRoom(roomCode, {
-                    type: SocketResponse.Correct,
-                    username: user,
-                });
+                sendMessageToRoom(roomCode, parsedMessage);
                 userMap[user].answered_correctly = true
                 if(entireLobbyAnsweredCorrectly(roomCode))
                 {

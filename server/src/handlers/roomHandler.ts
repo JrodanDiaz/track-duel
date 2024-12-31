@@ -49,7 +49,7 @@ export const generateRoomHandler = async (req: Request, res: Response) => {
     const roomCode = generateRoomCode();
     rooms[roomCode] = { users: new Set(), interval_id: null };
     userMap[user] = {roomCode: roomCode, answered_correctly: false}
-    console.log(`Rooms: ${JSON.stringify(rooms)}`);
+    console.log(`Rooms: ${Object.keys(rooms)}`);
     
     res.status(200).json({ roomCode: roomCode });
 }

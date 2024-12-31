@@ -110,6 +110,17 @@ export default function useWebsocketSetup() {
                 console.log(`Error Socket Response: ${parsedMessage.data.message}`);
                 break;
             case SocketResponse.Correct:
+                const correctUsername = parsedMessage.data.username as string;
+
+                setLobby((lobby) => {
+                    const updatedLobby = { ...lobby };
+                    if (updatedLobby[correctUsername] === undefined) {
+                        console.error("Correct Response Received From Disconnected User..");
+                        return lobby;
+                    }
+                    updatedLobby[correctUsername].score += parsedMessage.data.score as number;
+                    return updatedLobby;
+                });
                 setAnswers((prev) => [
                     ...prev,
                     {
@@ -221,8 +232,14 @@ export default function useWebsocketSetup() {
                 })
             );
         },
-        broadcastCorrectAnswer: () => {
-            socketRef.current?.send(JSON.stringify({ type: SocketRequest.Correct }));
+        broadcastCorrectAnswer: (score: number) => {
+            socketRef.current?.send(
+                JSON.stringify({
+                    type: SocketRequest.Correct,
+                    username: user.username,
+                    score: score,
+                })
+            );
         },
         lobby,
         startSignal,
