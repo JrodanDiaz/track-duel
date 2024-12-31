@@ -8,11 +8,10 @@ import { WebsocketContext } from "./Duel";
 import Player from "../common/Player";
 import Navbar from "../common/Navbar";
 import Button from "../common/Button";
-import useUser from "../../hooks/useUser";
 import Marquee from "../common/Marquee";
+import Scoreboard from "./Scoreboard";
 
 export default function TrackDuel() {
-    const userStore = useUser();
     const randomTracks = useTrackSelection();
     const playlist = usePlaylist();
     const navigate = useNavigate();
@@ -22,7 +21,6 @@ export default function TrackDuel() {
     const [songBreak, setSongBreak] = useState(false);
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
-    const [score, setScore] = useState<number>(0);
     const socket = useContext(WebsocketContext);
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -59,17 +57,17 @@ export default function TrackDuel() {
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setAnswer("");
         if (isCorrectAnswer(answer)) {
             setCorrect(true);
             setPlay(false);
             const elapsedTimeSeconds = Math.round((Date.now() - startTime) / 1000);
             if (elapsedTimeSeconds >= 100) return;
-            const updatedScore = score + (100 - elapsedTimeSeconds);
-            socket.broadcastCorrectAnswer(updatedScore);
+            const pointsScored = 100 - elapsedTimeSeconds;
+            socket.broadcastCorrectAnswer(pointsScored);
         } else {
             socket.sendAnswer(answer);
         }
+        setAnswer("");
     };
 
     const selectNextSong = () => {
@@ -95,7 +93,7 @@ export default function TrackDuel() {
     return (
         <BlackBackground>
             <Navbar enableRoomcode={false} />
-            {/* <div className="flex flex-col items-center h-screen"> */}
+            {songBreak && <p className="text-md text-blue-500 font-lato">SONG BREAK</p>}
             <div className="flex justify-center gap-8 h-screen mt-24">
                 {socket.loading && <p className="text-offwhite">Establishing connection...</p>}
                 <div className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500">
@@ -173,18 +171,16 @@ export default function TrackDuel() {
                         />
                     </form>
                 </div>
-                <div className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%]">
+                <Scoreboard className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%] p-4" />
+                {/* <div className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%]">
                     <p className="text-2xl text-offwhite font-semibold font-bebas">SCOREBOARD</p>
                     {Object.entries(socket.lobby).map(([player, data]) => (
                         <p className="text-xl text-offwhite font-kanit">
                             {player}: {data.score}
                         </p>
                     ))}
-                    {/* <p className="text-xl text-offwhite">
-                        {userStore.username}: {score}
-                    </p> */}
                     {songBreak && <p className="text-2xl text-blue-500">IN SONG BREAK STATE</p>}
-                </div>
+                </div> */}
             </div>
         </BlackBackground>
     );
