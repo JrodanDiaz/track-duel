@@ -177,6 +177,9 @@ export default function useWebsocketSetup() {
             clearTimeout(timeout);
             console.log("Cleaning up Websocket connection..");
             socketRef.current?.close();
+            setLobby({});
+            setRoomCode("");
+            setStartSignal(false);
         };
     }, [user]);
 
