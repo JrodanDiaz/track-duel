@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getSpotifyToken } from "../../api/spotify";
 import usePlaylist from "../../hooks/usePlaylist";
 import useTrackSelection from "../../hooks/useTrackSelection";
@@ -10,6 +10,8 @@ import Navbar from "../common/Navbar";
 import Button from "../common/Button";
 import Marquee from "../common/Marquee";
 import Scoreboard from "./Scoreboard";
+import DuelChat from "./DuelChat";
+import GamePlaylist from "./GamePlaylist";
 
 export default function TrackDuel() {
     const randomTracks = useTrackSelection();
@@ -23,7 +25,6 @@ export default function TrackDuel() {
     const [correct, setCorrect] = useState<boolean>(false);
     const [gameOver, setGameOver] = useState<boolean>(false);
     const socket = useContext(WebsocketContext);
-    const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
     if (!randomTracks) {
         console.error("Playlist is undefined");
@@ -86,20 +87,9 @@ export default function TrackDuel() {
         setStartTime(Date.now());
     };
 
-    const scrollToBottom = () => {
-        const container = chatContainerRef.current;
-        if (container) {
-            container.scrollTop = container.scrollHeight;
-        }
-    };
-
     const handleLeaveRoom = () => {
         socket.leaveRoom();
     };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [socket.answers]);
 
     const inbetweenSongs = songBreak && socket.continueSignal >= 2 && !gameOver;
 
@@ -122,64 +112,8 @@ export default function TrackDuel() {
             )}
             <div className={`flex justify-center gap-8 h-screen`}>
                 {socket.loading && <p className="text-offwhite">Establishing connection...</p>}
-                <div
-                    className={`w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500 `}
-                >
-                    <img src={playlist.images[0].url} height={150} width={150} />
-                    {Array.from({ length: 10 }).map((_, i) => (
-                        <Marquee
-                            content={playlist.name}
-                            className={`text-2xl tracking-wider ${
-                                i % 2 === 0 ? "text-offwhite " : " !bg-white !text-black"
-                            }`}
-                            reverse={i % 2 !== 0}
-                        />
-                    ))}
-                    <div className="hidden">
-                        <Player
-                            accessToken={getSpotifyToken()}
-                            trackUri={
-                                currentTrackIndex < randomTracks.length
-                                    ? randomTracks[currentTrackIndex].uri
-                                    : undefined
-                            }
-                            play={play}
-                            setPlay={setPlay}
-                        />
-                    </div>
-                </div>
-
-                <div className="w-2/5 h-4/5">
-                    <div
-                        className="border-2 border-gray-500 p-5 w-full h-4/5 overflow-y-auto"
-                        ref={chatContainerRef}
-                    >
-                        {socket.answers.length === 0 && (
-                            <p className="text-xl text-surface75 text-center">
-                                Dead chat... Someone say something
-                            </p>
-                        )}
-                        {socket.answers.map((answer, i) => {
-                            const answerStyle =
-                                "border-b-[1px] border-b-offwhite border-spacing-1 text-xl font-lato my-2";
-                            if (answer.isCorrect) {
-                                return (
-                                    <p className={`text-main-green  ${answerStyle}`}>
-                                        {answer.from} guessed the song correctly!
-                                    </p>
-                                );
-                            } else
-                                return (
-                                    <p
-                                        className={`${answerStyle} ${
-                                            i % 2 === 0 ? "text-offwhite " : " text-surface75"
-                                        }`}
-                                    >
-                                        <strong>{answer.from}:</strong> {answer.answer}
-                                    </p>
-                                );
-                        })}
-                    </div>
+                <GamePlaylist className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500" />
+                <DuelChat className="w-2/5 h-4/5">
                     <form onSubmit={handleSubmit} className="w-full">
                         <input
                             type="text"
@@ -196,8 +130,20 @@ export default function TrackDuel() {
                             disabled={correct && !gameOver}
                         />
                     </form>
-                </div>
+                </DuelChat>
                 <Scoreboard className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%] p-4" />
+            </div>
+            <div className="hidden">
+                <Player
+                    accessToken={getSpotifyToken()}
+                    trackUri={
+                        currentTrackIndex < randomTracks.length
+                            ? randomTracks[currentTrackIndex].uri
+                            : undefined
+                    }
+                    play={play}
+                    setPlay={setPlay}
+                />
             </div>
         </BlackBackground>
     );
