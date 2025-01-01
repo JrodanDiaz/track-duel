@@ -25,14 +25,13 @@ export const NavbarLink = ({
 
 interface Props {
     enableRoomcode?: boolean;
+    className?: string;
 }
 
-export default function Navbar({ enableRoomcode = false }: Props) {
+export default function Navbar({ enableRoomcode = false, className = "" }: Props) {
     const user = useUser();
     const socket = useContext(WebsocketContext);
-    const [clipboardSuccess, setClipboardSuccess] = useState<boolean | undefined>(
-        undefined
-    );
+    const [clipboardSuccess, setClipboardSuccess] = useState<boolean | undefined>(undefined);
     const handleClipboard = async () => {
         try {
             await navigator.clipboard.writeText(socket.roomCode);
@@ -48,27 +47,20 @@ export default function Navbar({ enableRoomcode = false }: Props) {
     }, [socket.roomCode]);
 
     return (
-        <nav className="border-[1px] border-transparent w-full flex justify-between items-center p-2 transition-colors duration-500 hover:border-b-offwhite/30">
+        <nav
+            className={`border-[1px] border-transparent w-full flex justify-between items-center p-2 transition-colors duration-500 hover:border-b-offwhite/30 ${className}`}
+        >
             <div className="text-6xl text-main-green font-bebas w-3/5 pl-16 flex justify-between">
                 TRACK DUEL
                 {socket.roomCode && enableRoomcode && (
                     <header className="text-5xl text-offwhite my-4 flex gap-3">
                         <p>
                             Room Code:{" "}
-                            <span className="text-main-green text-5xl">
-                                {socket.roomCode}
-                            </span>
+                            <span className="text-main-green text-5xl">{socket.roomCode}</span>
                         </p>
-                        <button
-                            onClick={handleClipboard}
-                            className="text-xl text-offwhite"
-                        >
+                        <button onClick={handleClipboard} className="text-xl text-offwhite">
                             <img
-                                src={
-                                    clipboardSuccess
-                                        ? "/check-square.svg"
-                                        : "/clipboard.svg"
-                                }
+                                src={clipboardSuccess ? "/check-square.svg" : "/clipboard.svg"}
                                 height={35}
                                 width={35}
                             />

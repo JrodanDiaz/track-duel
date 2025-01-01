@@ -43,10 +43,12 @@ export default function InactiveLobby() {
             <img src="/matrix.png" width={300} height={300} />
             <div
                 className={`flex w-1/3 ${
-                    socket.lobby.length > 0 ? "justify-center" : "justify-between"
+                    Object.keys(socket.lobby).length > 0
+                        ? "justify-center"
+                        : "justify-between"
                 }`}
             >
-                {socket.lobby.length === 0 && (
+                {Object.keys(socket.lobby).length === 0 && (
                     <>
                         <Button
                             content="Create Room"
