@@ -8,10 +8,13 @@ import { WebsocketContext } from "./Duel";
 import Player from "../common/Player";
 import Navbar from "../common/Navbar";
 import Button from "../common/Button";
-import Marquee from "../common/Marquee";
 import Scoreboard from "./Scoreboard";
 import DuelChat from "./DuelChat";
 import GamePlaylist from "./GamePlaylist";
+
+enum Timing {
+    Break_Seconds = 4,
+}
 
 export default function TrackDuel() {
     const randomTracks = useTrackSelection();
@@ -23,6 +26,7 @@ export default function TrackDuel() {
     const [songBreak, setSongBreak] = useState(false);
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
+    const [countdown, setCountdown] = useState(Timing.Break_Seconds);
     const [gameOver, setGameOver] = useState<boolean>(false);
     const socket = useContext(WebsocketContext);
 
@@ -55,10 +59,22 @@ export default function TrackDuel() {
             return;
         }
 
-        setTimeout(() => {
+        const interval_id = setInterval(() => {
+            if (countdown <= 0) return;
+            setCountdown((prev) => prev - 1);
+        }, 1000);
+
+        const timeout_id = setTimeout(() => {
+            clearInterval(interval_id);
+            setCountdown(4);
             setSongBreak(false);
             selectNextSong();
-        }, 4000);
+        }, Timing.Break_Seconds * 1000);
+
+        return () => {
+            clearInterval(interval_id);
+            clearTimeout(timeout_id);
+        };
     }, [socket.continueSignal]);
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -91,16 +107,9 @@ export default function TrackDuel() {
         socket.leaveRoom();
     };
 
-    const inbetweenSongs = songBreak && socket.continueSignal >= 2 && !gameOver;
-
     return (
         <BlackBackground>
             <Navbar enableRoomcode={false} className=" mb-12" />
-            {inbetweenSongs && (
-                <div className="flex justify-center items-center text-center text-3xl text-offwhite font-semibold font-lato">
-                    Song: {randomTracks[socket.continueSignal - 2].name}
-                </div>
-            )}
             {gameOver && (
                 <div className="flex justify-center items-center">
                     <Button
@@ -110,9 +119,18 @@ export default function TrackDuel() {
                     />
                 </div>
             )}
+            {songBreak && !gameOver && (
+                <div className="flex justify-center font-kanit text-3xl text-main-green">
+                    Song Starts In {countdown} seconds
+                </div>
+            )}
             <div className={`flex justify-center gap-8 h-screen`}>
                 {socket.loading && <p className="text-offwhite">Establishing connection...</p>}
-                <GamePlaylist className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500" />
+                <GamePlaylist
+                    trackIndex={currentTrackIndex}
+                    displayPreviousTrack={songBreak && socket.continueSignal > 1}
+                    className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500"
+                />
                 <DuelChat className="w-2/5 h-4/5">
                     <form onSubmit={handleSubmit} className="w-full">
                         <input
