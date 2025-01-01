@@ -21,6 +21,7 @@ export default function TrackDuel() {
     const [songBreak, setSongBreak] = useState(false);
     const [answer, setAnswer] = useState("");
     const [correct, setCorrect] = useState<boolean>(false);
+    const [gameOver, setGameOver] = useState<boolean>(false);
     const socket = useContext(WebsocketContext);
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,6 +49,10 @@ export default function TrackDuel() {
         if (socket.continueSignal <= 0) return;
         setSongBreak(true);
         setPlay(false);
+        if (socket.continueSignal >= randomTracks.length + 1) {
+            setGameOver(true);
+            return;
+        }
 
         setTimeout(() => {
             setSongBreak(false);
@@ -88,19 +93,40 @@ export default function TrackDuel() {
         }
     };
 
+    const handleLeaveRoom = () => {
+        socket.leaveRoom();
+    };
+
     useEffect(() => {
         scrollToBottom();
     }, [socket.answers]);
 
+    const inbetweenSongs = songBreak && socket.continueSignal >= 2 && !gameOver;
+
     return (
         <BlackBackground>
-            <Navbar enableRoomcode={false} />
-            {songBreak && <p className="text-md text-blue-500 font-lato">SONG BREAK</p>}
-            <div className="flex justify-center gap-8 h-screen mt-24">
+            <Navbar enableRoomcode={false} className=" mb-12" />
+            {inbetweenSongs && (
+                <div className="flex justify-center items-center text-center text-3xl text-offwhite font-semibold font-lato">
+                    Song: {randomTracks[socket.continueSignal - 2].name}
+                </div>
+            )}
+            {gameOver && (
+                <div className="flex justify-center items-center">
+                    <Button
+                        content="Back to Lobby"
+                        className="text-2xl rounded-sm text-red-600 border-red-600 transition-colors hover:bg-red-600 hover:text-black"
+                        onClick={handleLeaveRoom}
+                    />
+                </div>
+            )}
+            <div className={`flex justify-center gap-8 h-screen`}>
                 {socket.loading && <p className="text-offwhite">Establishing connection...</p>}
-                <div className="w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500">
+                <div
+                    className={`w-1/5 h-[64%] p-3 flex flex-col items-center overflow-x-hidden border-[1px] border-gray-500 `}
+                >
                     <img src={playlist.images[0].url} height={150} width={150} />
-                    {Array.from({ length: 8 }).map((_, i) => (
+                    {Array.from({ length: 10 }).map((_, i) => (
                         <Marquee
                             content={playlist.name}
                             className={`text-2xl tracking-wider ${
@@ -109,10 +135,14 @@ export default function TrackDuel() {
                             reverse={i % 2 !== 0}
                         />
                     ))}
-                    <div className=" flex flex-col gap-3 py-2">
+                    <div className="hidden">
                         <Player
                             accessToken={getSpotifyToken()}
-                            trackUri={randomTracks?.[currentTrackIndex].uri}
+                            trackUri={
+                                currentTrackIndex < randomTracks.length
+                                    ? randomTracks[currentTrackIndex].uri
+                                    : undefined
+                            }
                             play={play}
                             setPlay={setPlay}
                         />
@@ -157,26 +187,17 @@ export default function TrackDuel() {
                             placeholder="Enter answer here"
                             value={answer}
                             onChange={(e) => setAnswer(e.target.value)}
-                            disabled={correct}
+                            disabled={correct && !gameOver}
                         />
                         <Button
                             content="Submit"
                             submit={true}
                             className="w-1/5 text-xl font-kanit h-full !py-3 !bg-main-green !text-black disabled:border-gray-600 disabled:!text-offwhite disabled:!bg-gray-600"
-                            disabled={correct}
+                            disabled={correct && !gameOver}
                         />
                     </form>
                 </div>
                 <Scoreboard className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%] p-4" />
-                {/* <div className="flex flex-col items-center border-[1px] border-gray-500 w-1/5 h-[64%]">
-                    <p className="text-2xl text-offwhite font-semibold font-bebas">SCOREBOARD</p>
-                    {Object.entries(socket.lobby).map(([player, data]) => (
-                        <p className="text-xl text-offwhite font-kanit">
-                            {player}: {data.score}
-                        </p>
-                    ))}
-                    {songBreak && <p className="text-2xl text-blue-500">IN SONG BREAK STATE</p>}
-                </div> */}
             </div>
         </BlackBackground>
     );

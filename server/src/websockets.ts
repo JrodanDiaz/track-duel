@@ -187,6 +187,7 @@ export const configureWebsocketServer = (server: Server) => {
                 console.log(`Received Correct Request: ${JSON.stringify(parsedMessage)}`);
                 
                 if(!(user in userMap)) {
+                    console.log(Object.keys(userMap));
                     console.log("ERROR: CORRECT REQUEST RECEIVED FROM DISCONNECTED USER")
                     return
                 }
